@@ -222,20 +222,48 @@ export default function App() {
                       // User message with bubble
                       <div className="max-w-[85%] ml-auto">
                         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-2xl rounded-tr-md shadow-md border border-blue-400/20">
-                          <div className="prose prose-invert max-w-none text-white text-sm">
+                          <div className="prose prose-invert max-w-none text-white text-sm prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4">
                             <ReactMarkdown
                               components={{
                                 code: ({ node, inline, className, children, ...props }) => {
+                                  const match = /language-(\w+)/.exec(className || '');
                                   return inline ? (
                                     <code className="bg-blue-400/30 text-blue-100 px-1.5 py-0.5 rounded-lg text-sm font-mono border border-blue-300/30" {...props}>
                                       {children}
                                     </code>
                                   ) : (
-                                    <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-3 rounded-xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'}`}>
-                                      <code {...props}>{children}</code>
+                                    <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-3 rounded-xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'} relative`}>
+                                      {match && (
+                                        <div className="absolute right-3 top-3 text-xs px-2 py-1 rounded-md bg-blue-500/20 text-blue-200 border border-blue-400/20">
+                                          {match[1]}
+                                        </div>
+                                      )}
+                                      <code className={className} {...props}>{children}</code>
                                     </pre>
                                   );
-                                }
+                                },
+                                blockquote: ({ children }) => (
+                                  <blockquote className="border-l-4 border-blue-400/30 bg-blue-400/10 rounded-r-lg py-2 pl-4 pr-4">
+                                    {children}
+                                  </blockquote>
+                                ),
+                                table: ({ children }) => (
+                                  <div className="overflow-x-auto my-4">
+                                    <table className="min-w-full border border-blue-400/30">
+                                      {children}
+                                    </table>
+                                  </div>
+                                ),
+                                th: ({ children }) => (
+                                  <th className="px-4 py-2 text-left bg-blue-500/20 border border-blue-400/30">
+                                    {children}
+                                  </th>
+                                ),
+                                td: ({ children }) => (
+                                  <td className="px-4 py-2 border border-blue-400/30">
+                                    {children}
+                                  </td>
+                                )
                               }}
                             >
                               {msg.text}
@@ -265,10 +293,15 @@ export default function App() {
                       </div>
                     ) : (
                       // Assistant message without bubble
-                      <div className={`prose max-w-none text-sm ${darkMode ? 'prose-invert text-gray-200' : 'prose-slate text-slate-800'}`}>
+                      <div className={`prose max-w-none text-sm ${
+                        darkMode 
+                          ? 'prose-invert text-gray-200 prose-headings:text-gray-100 prose-a:text-blue-400 prose-strong:text-gray-100 prose-li:marker:text-gray-400'
+                          : 'prose-slate text-slate-800 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900'
+                      } prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4`}>
                         <ReactMarkdown
                           components={{
                             code: ({ node, inline, className, children, ...props }) => {
+                              const match = /language-(\w+)/.exec(className || '');
                               return inline ? (
                                 <code className={`px-1.5 py-0.5 rounded-lg text-sm font-mono ${
                                   darkMode 
@@ -278,11 +311,52 @@ export default function App() {
                                   {children}
                                 </code>
                               ) : (
-                                <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-4 rounded-2xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'}`}>
-                                  <code {...props}>{children}</code>
+                                <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-4 rounded-2xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'} relative`}>
+                                  {match && (
+                                    <div className="absolute right-4 top-4 text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+                                      {match[1]}
+                                    </div>
+                                  )}
+                                  <code className={className} {...props}>{children}</code>
                                 </pre>
                               );
-                            }
+                            },
+                            blockquote: ({ children }) => (
+                              <blockquote className={`border-l-4 pl-4 ${
+                                darkMode
+                                  ? 'border-gray-700 bg-gray-800/50'
+                                  : 'border-slate-300 bg-slate-50'
+                              } rounded-r-lg py-2 pr-4`}>
+                                {children}
+                              </blockquote>
+                            ),
+                            table: ({ children }) => (
+                              <div className="overflow-x-auto my-4">
+                                <table className={`min-w-full border ${
+                                  darkMode ? 'border-gray-700' : 'border-slate-200'
+                                }`}>
+                                  {children}
+                                </table>
+                              </div>
+                            ),
+                            th: ({ children }) => (
+                              <th className={`px-4 py-2 text-left ${
+                                darkMode
+                                  ? 'bg-gray-800 border-gray-700'
+                                  : 'bg-slate-100 border-slate-200'
+                              } border`}>
+                                {children}
+                              </th>
+                            ),
+                            td: ({ children }) => (
+                              <td className={`px-4 py-2 ${
+                                darkMode
+                                  ? 'border-gray-700'
+                                  : 'border-slate-200'
+                              } border`}>
+                                {children}
+                              </td>
+                            )
                           }}
                         >
                           {msg.text}
