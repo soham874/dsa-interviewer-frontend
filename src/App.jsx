@@ -471,7 +471,7 @@ export default function App() {
               </div>
               <div>
                 <h2 className="text-xl font-bold">Code Editor</h2>
-                <p className="text-slate-300 text-sm">Write and test your code</p>
+                <p className="text-slate-300 text-sm">Write your code here</p>
               </div>
             </div>
             {attachCode && noteText.trim() && (
