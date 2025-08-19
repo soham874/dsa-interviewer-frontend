@@ -53,7 +53,12 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("http://localhost:8080/chat/stream", {
+      const API_BASE_URL = process.env.NODE_ENV === 'production'
+        ? 'https://dsa-interviewer-toolkit.onrender.com'
+        : 'http://localhost:8080';
+
+      // Then in your fetch call:
+      const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ thread_id: "1234", message: messageContent }),
