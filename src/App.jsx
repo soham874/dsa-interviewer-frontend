@@ -57,7 +57,6 @@ export default function App() {
         ? 'https://dsa-interviewer-toolkit.onrender.com'
         : 'http://localhost:8080';
 
-      // Then in your fetch call:
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -86,23 +85,50 @@ export default function App() {
       let fullResponse = "";
 
       while (true) {
-        const { value, done } = await reader.read();
-        if (done) break;
+          const { value, done } = await reader.read();
+          if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
+          // Decode the chunk and add to buffer
+          buffer += decoder.decode(value, { stream: true });
 
-        const lines = buffer.split("\n");
-        buffer = lines.pop();
+          // Process complete SSE messages (separated by \n\n)
+          let parts = buffer.split('\n\n');
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const chunk = line.slice(6);
-            if (chunk.trim() === "end") continue;
+          // Keep the last part in buffer (might be incomplete)
+          buffer = parts.pop() || "";
 
-            fullResponse += chunk;
-            updateAssistantMessage(fullResponse);
+          // Process complete SSE messages
+          for (const part of parts) {
+            if (part.trim() === '') continue;
+
+            const lines = part.split('\n');
+            let eventType = null;
+            let data = null;
+
+            for (const line of lines) {
+              if (line.startsWith('event: ')) {
+                eventType = line.slice(7).trim();
+              } else if (line.startsWith('data: ')) {
+                data = line.slice(6);
+              }
+            }
+
+            // Handle the data
+            if (data !== null) {
+              if (eventType === 'end' || data.trim() === 'end') {
+                // Stream ended
+                break;
+              } else {
+                // Regular data chunk - handle both escaped and unescaped newlines
+                let chunk = data;
+                if (data.includes('\\n')) {
+                  chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
+                }
+                fullResponse += chunk;
+                updateAssistantMessage(fullResponse);
+              }
+            }
           }
-        }
       }
     } catch (error) {
       console.error("Error:", error);
@@ -141,12 +167,12 @@ export default function App() {
   };
 
   return (
-    <div className={`flex h-screen p-4 gap-4 ${darkMode 
-      ? 'bg-gradient-to-br from-gray-900 to-slate-800' 
+    <div className={`flex h-screen p-4 gap-4 ${darkMode
+      ? 'bg-gradient-to-br from-gray-900 to-slate-800'
       : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
       {/* Chat Section - Left Half */}
-      <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden ${darkMode 
-        ? 'bg-gray-800 border border-gray-700' 
+      <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden ${darkMode
+        ? 'bg-gray-800 border border-gray-700'
         : 'bg-white border border-slate-100'}`}>
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 shadow-sm relative">
@@ -180,8 +206,8 @@ export default function App() {
         </div>
 
         {/* Chat Messages */}
-        <div className={`flex-1 overflow-y-auto p-4 ${darkMode 
-          ? 'bg-gray-800/50' 
+        <div className={`flex-1 overflow-y-auto p-4 ${darkMode
+          ? 'bg-gray-800/50'
           : 'bg-slate-50/30'}`}>
           {messages.length === 0 ? (
             // Welcome screen
@@ -278,19 +304,31 @@ export default function App() {
 
                         {/* Code Attachment for User */}
                         {msg.hasAttachedCode && (
-                          <div className="mt-3 p-4 bg-gradient-to-r from-emerald-50 to-blue-50 border border-emerald-200 rounded-2xl shadow-sm">
+                          <div className={`mt-3 p-4 rounded-2xl shadow-sm border ${
+                            darkMode
+                              ? 'bg-gradient-to-r from-emerald-900/50 to-blue-900/50 border-emerald-700/50'
+                              : 'bg-gradient-to-r from-emerald-50 to-blue-50 border-emerald-200'
+                          }`}>
                             <div className="flex items-center gap-2 mb-3">
                               <div className="w-6 h-6 bg-emerald-500 rounded-xl flex items-center justify-center">
                                 <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
                                   <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
                                 </svg>
                               </div>
-                              <span className="text-sm font-semibold text-emerald-700">Code Attachment</span>
-                              <span className="text-xs bg-emerald-100 text-emerald-600 px-2 py-1 rounded-full border border-emerald-200">
+                              <span className={`text-sm font-semibold ${darkMode ? 'text-emerald-300' : 'text-emerald-700'}`}>Code Attachment</span>
+                              <span className={`text-xs px-2 py-1 rounded-full border ${
+                                darkMode
+                                  ? 'bg-emerald-900/50 text-emerald-300 border-emerald-700'
+                                  : 'bg-emerald-100 text-emerald-600 border-emerald-200'
+                              }`}>
                                 {msg.attachedCode.split('\n').length} lines
                               </span>
                             </div>
-                            <pre className="text-sm bg-slate-900 text-slate-100 p-3 rounded-xl overflow-x-auto shadow-inner font-mono border border-slate-700">
+                            <pre className={`text-sm p-3 rounded-xl overflow-x-auto shadow-inner font-mono border ${
+                              darkMode
+                                ? 'bg-gray-900 text-gray-100 border-gray-700'
+                                : 'bg-slate-900 text-slate-100 border-slate-700'
+                            }`}>
                               <code>{msg.attachedCode}</code>
                             </pre>
                           </div>
@@ -299,7 +337,7 @@ export default function App() {
                     ) : (
                       // Assistant message without bubble
                       <div className={`prose max-w-none text-sm ${
-                        darkMode 
+                        darkMode
                           ? 'prose-invert text-gray-200 prose-headings:text-gray-100 prose-a:text-blue-400 prose-strong:text-gray-100 prose-li:marker:text-gray-400'
                           : 'prose-slate text-slate-800 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900'
                       } prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4`}>
@@ -309,8 +347,8 @@ export default function App() {
                               const match = /language-(\w+)/.exec(className || '');
                               return inline ? (
                                 <code className={`px-1.5 py-0.5 rounded-lg text-sm font-mono ${
-                                  darkMode 
-                                    ? 'bg-gray-700 text-gray-200 border border-gray-600' 
+                                  darkMode
+                                    ? 'bg-gray-700 text-gray-200 border border-gray-600'
                                     : 'bg-slate-100 text-slate-800 border border-slate-200'
                                 }`} {...props}>
                                   {children}
@@ -386,7 +424,7 @@ export default function App() {
                       <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
                       <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
                     </div>
-                    <span className="ml-3 text-slate-600 text-sm">Sarthi is thinking...</span>
+                    <span className={`ml-3 text-sm ${darkMode ? 'text-gray-400' : 'text-slate-600'}`}>Sarthi is thinking...</span>
                   </div>
                 </div>
               )}
@@ -397,15 +435,15 @@ export default function App() {
         </div>
 
         {/* Input Area */}
-        <div className={`p-6 shadow-sm ${darkMode 
-          ? 'bg-gray-800 border-t border-gray-700' 
+        <div className={`p-6 shadow-sm ${darkMode
+          ? 'bg-gray-800 border-t border-gray-700'
           : 'bg-white border-t border-slate-200'}`}>
           <div className="max-w-full">
             {/* Attach Code Checkbox */}
             <div className="mb-4">
               <label className={`flex items-center gap-3 text-sm cursor-pointer group transition-colors ${
-                darkMode 
-                  ? 'text-gray-300 hover:text-gray-200' 
+                darkMode
+                  ? 'text-gray-300 hover:text-gray-200'
                   : 'text-slate-700 hover:text-slate-800'
               }`}>
                 <div className="relative">
@@ -416,14 +454,22 @@ export default function App() {
                     className="w-4 h-4 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
                   />
                 </div>
-                <div className="w-5 h-5 bg-slate-100 rounded-xl flex items-center justify-center group-hover:bg-slate-200 transition-colors border border-slate-200">
-                  <svg className="w-3 h-3 text-slate-600" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`w-5 h-5 rounded-xl flex items-center justify-center group-hover:bg-opacity-75 transition-colors border ${
+                  darkMode
+                    ? 'bg-gray-700 border-gray-600 group-hover:bg-gray-600'
+                    : 'bg-slate-100 border-slate-200 group-hover:bg-slate-200'
+                }`}>
+                  <svg className={`w-3 h-3 ${darkMode ? 'text-gray-300' : 'text-slate-600'}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
                   </svg>
                 </div>
                 <span className="font-medium">Attach code from editor</span>
                 {attachCode && noteText.trim() && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-medium shadow-sm border border-blue-200">
+                  <span className={`text-xs px-3 py-1 rounded-full font-medium shadow-sm border ${
+                    darkMode
+                      ? 'bg-blue-900/50 text-blue-300 border-blue-700'
+                      : 'bg-blue-100 text-blue-700 border-blue-200'
+                  }`}>
                     {noteText.split('\n').length} lines ready
                   </span>
                 )}
@@ -431,10 +477,14 @@ export default function App() {
             </div>
 
             <form onSubmit={sendMessage} className="relative">
-              <div className={`flex items-end bg-white rounded-2xl shadow-sm transition-all duration-200 border-2 ${
-                attachCode && noteText.trim()
-                  ? 'border-blue-300 ring-2 ring-blue-100'
-                  : 'border-slate-200 hover:border-slate-300 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100'
+              <div className={`flex items-end rounded-2xl shadow-sm transition-all duration-200 border-2 ${
+                darkMode
+                  ? attachCode && noteText.trim()
+                    ? 'bg-gray-700 border-blue-500 ring-2 ring-blue-900'
+                    : 'bg-gray-700 border-gray-600 hover:border-gray-500 focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-900'
+                  : attachCode && noteText.trim()
+                    ? 'bg-white border-blue-300 ring-2 ring-blue-100'
+                    : 'bg-white border-slate-200 hover:border-slate-300 focus-within:border-blue-300 focus-within:ring-2 focus-within:ring-blue-100'
               }`}>
                 <textarea
                   ref={textareaRef}
@@ -442,13 +492,17 @@ export default function App() {
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="Message Sarthi..."
-                  className="flex-1 resize-none border-none outline-none p-4 rounded-2xl max-h-32 min-h-[52px] placeholder-slate-400"
+                  className={`flex-1 resize-none border-none outline-none p-4 rounded-2xl max-h-32 min-h-[52px] ${
+                    darkMode
+                      ? 'bg-transparent text-gray-200 placeholder-gray-400'
+                      : 'bg-transparent placeholder-slate-400'
+                  }`}
                   rows="1"
                   disabled={isLoading}
                 />
               </div>
             </form>
-            <p className="text-xs text-slate-500 text-center mt-3">
+            <p className={`text-xs text-center mt-3 ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>
               Sarthi can make mistakes. Consider checking important information.
             </p>
           </div>
@@ -457,14 +511,14 @@ export default function App() {
 
       {/* Notes Section - Right Half */}
       <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden ${
-        darkMode 
-          ? 'bg-gray-800 border border-gray-700' 
+        darkMode
+          ? 'bg-gray-800 border border-gray-700'
           : 'bg-white border border-slate-100'
       }`}>
         {/* Notes Header */}
         <div className={`p-6 shadow-sm ${
-          darkMode 
-            ? 'bg-gradient-to-r from-gray-800 to-slate-900' 
+          darkMode
+            ? 'bg-gradient-to-r from-gray-800 to-slate-900'
             : 'bg-gradient-to-r from-slate-700 to-slate-800'
         } text-white`}>
           <div className="flex items-center justify-between">
@@ -492,8 +546,8 @@ export default function App() {
 
         {/* Notes Text Area */}
         <div className={`flex-1 p-6 ${
-          darkMode 
-            ? 'bg-gradient-to-br from-gray-900 to-gray-800' 
+          darkMode
+            ? 'bg-gradient-to-br from-gray-900 to-gray-800'
             : 'bg-gradient-to-br from-slate-50 to-slate-100'
         }`}>
           <div className="h-full relative">
@@ -509,8 +563,8 @@ function example() {
               className={`w-full h-full resize-none rounded-2xl p-6 outline-none transition-all duration-200 shadow-sm font-mono text-sm leading-relaxed border-2 ${
                 darkMode
                   ? attachCode && noteText.trim()
-                    ? 'border-emerald-500/30 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-900 bg-gray-900 text-gray-100'
-                    : 'border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-900 bg-gray-900 text-gray-100 hover:border-gray-600'
+                    ? 'border-emerald-500/30 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-900 bg-gray-900 text-gray-100 placeholder-gray-500'
+                    : 'border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-900 bg-gray-900 text-gray-100 hover:border-gray-600 placeholder-gray-500'
                   : attachCode && noteText.trim()
                     ? 'border-emerald-200 focus:border-emerald-300 focus:ring-2 focus:ring-emerald-100 bg-emerald-50/50'
                     : 'border-slate-200 focus:border-blue-300 focus:ring-2 focus:ring-blue-100 bg-white hover:border-slate-300'
@@ -522,7 +576,11 @@ function example() {
               }}
             />
             {noteText.trim() && (
-              <div className="absolute bottom-4 right-4 bg-slate-800/90 text-white px-3 py-1 rounded-xl text-xs font-mono backdrop-blur-sm border border-slate-600">
+              <div className={`absolute bottom-4 right-4 px-3 py-1 rounded-xl text-xs font-mono backdrop-blur-sm border ${
+                darkMode
+                  ? 'bg-slate-800/90 text-white border-slate-600'
+                  : 'bg-white/90 text-slate-700 border-slate-300'
+              }`}>
                 {noteText.split('\n').length} lines, {noteText.length} chars
               </div>
             )}
