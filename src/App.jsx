@@ -152,18 +152,13 @@ export default function App() {
   const handleCodeEditorKeyDown = (e) => {
     if (e.key === 'Tab') {
       e.preventDefault();
-      const textarea = e.target;
-      const start = textarea.selectionStart;
-      const end = textarea.selectionEnd;
 
-      // Insert tab character
-      const newValue = noteText.substring(0, start) + '\t' + noteText.substring(end);
-      setNoteText(newValue);
+      // Modern approach that preserves native undo
+      e.target.setRangeText('\t', e.target.selectionStart, e.target.selectionEnd, 'end');
 
-      // Move cursor after the tab
-      setTimeout(() => {
-        textarea.selectionStart = textarea.selectionEnd = start + 1;
-      }, 0);
+      // Trigger the onChange event manually since setRangeText doesn't
+      const event = new Event('input', { bubbles: true });
+      e.target.dispatchEvent(event);
     }
   };
 

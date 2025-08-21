@@ -12,10 +12,10 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
             </svg>
           </div>
           <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            How can I help you today?
+            Are you ready?
           </h2>
           <p className={`text-base ${darkMode ? 'text-gray-300' : 'text-slate-600'}`}>
-            Ask me about coding, debugging, or any technical questions!
+            Sarthi is ready to grill you. Drop a hello to get the ball rolling!
           </p>
         </div>
       </div>

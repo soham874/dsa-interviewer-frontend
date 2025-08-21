@@ -6,17 +6,20 @@ export default function MarkdownRenderer({ content, darkMode }) {
     <ReactMarkdown
       components={{
         code: ({ node, inline, className, children, ...props }) => {
+          // Force inline for single-line code without language specification
           const match = /language-(\w+)/.exec(className || '');
-          return inline ? (
-            <code className={`px-1.5 py-0.5 rounded-lg text-sm font-mono ${
+          const isInline = inline || (!match && !String(children).includes('\n'));
+
+          return isInline ? (
+            <code className={`px-1 py-0.5 mx-0.5 rounded text-sm font-mono ${
               darkMode
-                ? 'bg-gray-700 text-gray-200 border border-gray-600'
-                : 'bg-slate-100 text-slate-800 border border-slate-200'
+                ? 'bg-gray-700 text-gray-200'
+                : 'bg-slate-100 text-slate-800'
             }`} {...props}>
               {children}
             </code>
           ) : (
-            <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-4 rounded-2xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'} relative`}>
+            <pre className={`${darkMode ? 'bg-gray-900' : 'bg-slate-900'} text-slate-100 p-4 rounded-2xl overflow-x-auto shadow-inner border ${darkMode ? 'border-gray-700' : 'border-slate-700'} relative my-4`}>
               {match && (
                 <div className="absolute right-4 top-4 text-xs px-2 py-1 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
                   {match[1]}
