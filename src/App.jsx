@@ -8,7 +8,7 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [attachCode, setAttachCode] = useState(false);
-  const [darkMode, setDarkMode] = useState(true);
+  const [darkMode, setDarkMode] = useState(false);
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
   const codeEditorRef = useRef(null);
@@ -86,50 +86,75 @@ export default function App() {
       let fullResponse = "";
 
       while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
+        const { value, done } = await reader.read();
+        if (done) break;
 
-          // Decode the chunk and add to buffer
-          buffer += decoder.decode(value, { stream: true });
+        // Decode the chunk and add to buffer
+        buffer += decoder.decode(value, { stream: true });
 
-          // Process complete SSE messages (separated by \n\n)
-          let parts = buffer.split('\n\n');
+        // Process complete SSE messages (separated by \n\n)
+        let parts = buffer.split('\n\n');
 
-          // Keep the last part in buffer (might be incomplete)
-          buffer = parts.pop() || "";
+        // Keep the last part in buffer (might be incomplete)
+        buffer = parts.pop() || "";
 
-          // Process complete SSE messages
-          for (const part of parts) {
-            if (part.trim() === '') continue;
+        // Process complete SSE messages
+        for (const part of parts) {
+          if (part.trim() === '') continue;
 
-            const lines = part.split('\n');
-            let eventType = null;
-            let data = null;
+          const lines = part.split('\n');
+          let eventType = null;
+          let dataLines = [];
 
-            for (const line of lines) {
-              if (line.startsWith('event: ')) {
-                eventType = line.slice(7).trim();
-              } else if (line.startsWith('data: ')) {
-                data = line.slice(6);
-              }
-            }
-
-            // Handle the data
-            if (data !== null) {
-              if (eventType === 'end' || data.trim() === 'end') {
-                // Stream ended
-                break;
-              } else {
-                // Regular data chunk - handle both escaped and unescaped newlines
-                let chunk = data;
-                if (data.includes('\\n')) {
-                  chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-                }
-                fullResponse += chunk;
-                updateAssistantMessage(fullResponse);
-              }
+          for (const line of lines) {
+            if (line.startsWith('event: ')) {
+              eventType = line.slice(7).trim();
+            } else if (line.startsWith('data: ')) {
+              dataLines.push(line.slice(6));
             }
           }
+
+          // Handle the data
+          if (dataLines.length > 0) {
+            // Join all data lines for this SSE message
+            const data = dataLines.join('\n');
+
+            if (eventType === 'end' || data.trim() === 'end') {
+              // Stream ended
+              break;
+            } else {
+              // Regular data chunk - handle escaped newlines
+              let chunk = data;
+              if (data.includes('\\n')) {
+                chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
+              }
+              fullResponse += chunk;
+              updateAssistantMessage(fullResponse);
+            }
+          }
+        }
+      }
+
+      // Process any remaining data in buffer
+      if (buffer.trim()) {
+        const lines = buffer.split('\n');
+        let dataLines = [];
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            dataLines.push(line.slice(6));
+          }
+        }
+
+        if (dataLines.length > 0) {
+          const data = dataLines.join('\n');
+          let chunk = data;
+          if (data.includes('\\n')) {
+            chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
+          }
+          fullResponse += chunk;
+          updateAssistantMessage(fullResponse);
+        }
       }
     } catch (error) {
       console.error("Error:", error);
