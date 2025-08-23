@@ -1,6 +1,26 @@
 import React from 'react';
+import { API_BASE_URL } from '../../config';
 
 export default function CodeEditorHeader({ noteText, attachCode }) {
+
+    function clearAllCookies() {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf("=");
+        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+      }
+    }
+
+  const handleLogout = async () => {
+    await fetch(`${API_BASE_URL}/logout`, { method: "POST", credentials: "include" });
+    localStorage.clear();  // if you stored anything client-side
+    sessionStorage.clear(); // if you stored anything in session
+    clearAllCookies();
+    window.location.reload();
+  };
+
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -14,14 +34,25 @@ export default function CodeEditorHeader({ noteText, attachCode }) {
           <p className="text-slate-300 text-sm">Write your code here</p>
         </div>
       </div>
-      {attachCode && noteText.trim() && (
-        <div className="flex items-center gap-2 bg-emerald-500/20 px-3 py-2 rounded-xl backdrop-blur-sm border border-emerald-400/30">
-          <svg className="w-4 h-4 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+      <div className="flex items-center gap-4">
+        {attachCode && noteText.trim() && (
+          <div className="flex items-center gap-2 bg-emerald-500/20 px-3 py-2 rounded-xl backdrop-blur-sm border border-emerald-400/30">
+            <svg className="w-4 h-4 text-emerald-300" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span className="text-sm font-medium text-emerald-300">Ready to attach</span>
+          </div>
+        )}
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-all duration-200 border border-red-400/20 hover:border-red-400/40"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          <span className="text-sm font-medium text-emerald-300">Ready to attach</span>
-        </div>
-      )}
+          Logout
+        </button>
+      </div>
     </div>
   );
 }
