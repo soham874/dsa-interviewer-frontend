@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatSection from './components/Chat/ChatSection';
 import CodeEditor from './components/CodeEditor/CodeEditor';
+import { API_BASE_URL } from './config';
 
 export default function App() {
   const [messages, setMessages] = useState([]);
@@ -54,10 +55,6 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production'
-        ? 'https://dsa-interviewer-toolkit.onrender.com'
-        : 'http://localhost:8080';
-
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
