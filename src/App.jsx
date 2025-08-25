@@ -55,10 +55,18 @@ export default function App() {
     setIsLoading(true);
 
     try {
+
+      let session_uuid_val = localStorage.getItem("session_uuid");
+
+      if (!session_uuid_val) {
+        session_uuid_val = crypto.randomUUID();
+        localStorage.setItem("session_uuid", session_uuid_val);
+      }
+
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thread_id: "1234", message: messageContent }),
+        body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent }),
       });
 
       const reader = response.body.getReader();
