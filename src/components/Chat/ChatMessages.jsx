@@ -112,7 +112,7 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
               <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.1s'}}></div>
               <div className="w-3 h-3 bg-purple-400 rounded-full animate-bounce" style={{animationDelay: '0.2s'}}></div>
             </div>
-            <span className={`ml-3 text-sm ${darkMode ? 'text-gray-400' : 'text-slate-600'}`}>Sarthi is thinking...</span>
+            <span className={`ml-3 text-sm ${darkMode ? 'text-gray-400' : 'text-slate-600'}`}>Sarthi is typing...</span>
           </div>
         </div>
       )}

@@ -4,6 +4,7 @@ import CodeEditor from './components/CodeEditor/CodeEditor';
 import { API_BASE_URL } from './config';
 
 export default function App() {
+  const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +30,13 @@ export default function App() {
       textareaRef.current.style.height = textareaRef.current.scrollHeight + 'px';
     }
   }, [input]);
+
+  useEffect(() => {
+    // Refresh token on page reload
+    const newUuid = crypto.randomUUID();
+    setSessionUuid(newUuid);
+    localStorage.setItem('session_uuid', newUuid);
+  }, []);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -56,15 +64,12 @@ export default function App() {
 
     try {
 
-      let session_uuid_val = null;
-
-      if (!session_uuid_val) {
-        session_uuid_val = crypto.randomUUID();
-      }
+      const session_uuid_val = localStorage.getItem('session_uuid');
 
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent }),
       });
 
