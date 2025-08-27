@@ -56,11 +56,10 @@ export default function App() {
 
     try {
 
-      let session_uuid_val = localStorage.getItem("session_uuid");
+      let session_uuid_val = null;
 
       if (!session_uuid_val) {
         session_uuid_val = crypto.randomUUID();
-        localStorage.setItem("session_uuid", session_uuid_val);
       }
 
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {

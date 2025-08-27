@@ -4,7 +4,19 @@ import ReactMarkdown from 'react-markdown';
 export default function MarkdownRenderer({ content, darkMode }) {
   return (
     <ReactMarkdown
+      remarkPlugins={[]}
+      rehypePlugins={[]}
+      skipHtml={false}
       components={{
+        img: ({node, src, alt, ...props}) => (
+          <img
+            src={src}
+            alt={alt}
+            className="max-w-full h-auto rounded-lg shadow-md my-4"
+            loading="lazy"
+            {...props}
+          />
+        ),
         code: ({ node, inline, className, children, ...props }) => {
           // Force inline for single-line code without language specification
           const match = /language-(\w+)/.exec(className || '');
