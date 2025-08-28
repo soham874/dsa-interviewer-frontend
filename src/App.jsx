@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import ChatSection from './components/Chat/ChatSection';
 import CodeEditor from './components/CodeEditor/CodeEditor';
+import { API_BASE_URL } from './config';
 
 export default function App() {
+  const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +31,13 @@ export default function App() {
     }
   }, [input]);
 
+  useEffect(() => {
+    // Refresh token on page reload
+    const newUuid = crypto.randomUUID();
+    setSessionUuid(newUuid);
+    localStorage.setItem('session_uuid', newUuid);
+  }, []);
+
   const sendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
@@ -54,14 +63,14 @@ export default function App() {
     setIsLoading(true);
 
     try {
-      const API_BASE_URL = process.env.NODE_ENV === 'production'
-        ? 'https://dsa-interviewer-toolkit.onrender.com'
-        : 'http://localhost:8080';
+
+      const session_uuid_val = localStorage.getItem('session_uuid');
 
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thread_id: "1234", message: messageContent }),
+        credentials: "include",
+        body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent }),
       });
 
       const reader = response.body.getReader();

@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { Mic, MicOff } from "lucide-react"; // professional icons
 
 export default function ChatInput({
   darkMode,
@@ -12,6 +13,48 @@ export default function ChatInput({
   noteText,
   textareaRef
 }) {
+  const recognitionRef = useRef(null);
+  const [isRecording, setIsRecording] = useState(false);
+
+  // Start/stop voice input
+  const toggleRecording = () => {
+    if (!("webkitSpeechRecognition" in window)) {
+      alert("Your browser does not support speech recognition.");
+      return;
+    }
+
+    if (isRecording) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      return;
+    }
+
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onresult = (event) => {
+      let finalTranscript = "";
+      for (let i = 0; i < event.results.length; i++) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        }
+      }
+      if (finalTranscript) {
+        setInput((prev) => prev + (prev ? " " : "") + finalTranscript.trim());
+      }
+    };
+
+    recognition.onend = () => {
+      setIsRecording(false);
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+    setIsRecording(true);
+  };
+
   return (
     <div className={`p-6 shadow-sm ${darkMode
       ? 'bg-gray-800 border-t border-gray-700'
@@ -31,15 +74,6 @@ export default function ChatInput({
                 onChange={(e) => setAttachCode(e.target.checked)}
                 className="w-4 h-4 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
               />
-            </div>
-            <div className={`w-5 h-5 rounded-xl flex items-center justify-center group-hover:bg-opacity-75 transition-colors border ${
-              darkMode
-                ? 'bg-gray-700 border-gray-600 group-hover:bg-gray-600'
-                : 'bg-slate-100 border-slate-200 group-hover:bg-slate-200'
-            }`}>
-              <svg className={`w-3 h-3 ${darkMode ? 'text-gray-300' : 'text-slate-600'}`} fill="currentColor" viewBox="0 0 24 24">
-                <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0L19.2 12l-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
-              </svg>
             </div>
             <span className="font-medium">Attach code from editor</span>
             {attachCode && noteText.trim() && (
@@ -78,6 +112,21 @@ export default function ChatInput({
               rows="1"
               disabled={isLoading}
             />
+
+            {/* Mic button */}
+            <button
+              type="button"
+              onClick={toggleRecording}
+              className={`p-3 m-2 rounded-full transition-colors ${
+                isRecording
+                  ? "bg-red-500 text-white"
+                  : darkMode
+                    ? "bg-gray-600 hover:bg-gray-500 text-gray-200"
+                    : "bg-slate-100 hover:bg-slate-200 text-slate-700"
+              }`}
+            >
+              {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
+            </button>
           </div>
         </form>
         <p className={`text-xs text-center mt-3 ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>

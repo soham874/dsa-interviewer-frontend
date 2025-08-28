@@ -1,9 +1,13 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 export default function MarkdownRenderer({ content, darkMode }) {
   return (
     <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      rehypePlugins={[rehypeRaw]}
       components={{
         code: ({ node, inline, className, children, ...props }) => {
           // Force inline for single-line code without language specification
