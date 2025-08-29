@@ -71,7 +71,7 @@ export default function ChatInput({
               <input
                 type="checkbox"
                 checked={attachCode}
-                onChange={(e) => setAttachCode(e.target.checked)}
+                onChange={(e) => setAttachCode(!e.target.checked)}
                 className="w-4 h-4 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
               />
             </div>
@@ -130,7 +130,7 @@ export default function ChatInput({
           </div>
         </form>
         <p className={`text-xs text-center mt-3 ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-          Sarthi can make mistakes. Consider checking important information.
+          Sarthi can take time to respond while taking notes or sorting through questions for you
         </p>
       </div>
     </div>

@@ -3,21 +3,21 @@ import { API_BASE_URL } from '../../config';
 
 export default function CodeEditorHeader({ noteText, attachCode }) {
 
-    function clearAllCookies() {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-        const cookie = cookies[i];
-        const eqPos = cookie.indexOf("=");
-        const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
-        document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
-      }
-    }
+//     function clearAllCookies() {
+//       const cookies = document.cookie.split(';');
+//       for (let i = 0; i < cookies.length; i++) {
+//         const cookie = cookies[i];
+//         const eqPos = cookie.indexOf("=");
+//         const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+//         document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 UTC;path=/;";
+//       }
+//     }
 
   const handleLogout = async () => {
     await fetch(`${API_BASE_URL}/logout`, { method: "POST", credentials: "include" });
     localStorage.clear();  // if you stored anything client-side
     sessionStorage.clear(); // if you stored anything in session
-    clearAllCookies();
+//     clearAllCookies();
     window.location.reload();
   };
 
