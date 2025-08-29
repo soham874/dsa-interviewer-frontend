@@ -71,7 +71,7 @@ export default function ChatInput({
               <input
                 type="checkbox"
                 checked={attachCode}
-                onChange={(e) => setAttachCode(e.target.checked)}
+                onChange={(e) => setAttachCode(!e.target.checked)}
                 className="w-4 h-4 rounded-lg border-slate-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
               />
             </div>
