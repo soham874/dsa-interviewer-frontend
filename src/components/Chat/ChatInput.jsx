@@ -130,7 +130,7 @@ export default function ChatInput({
           </div>
         </form>
         <p className={`text-xs text-center mt-3 ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>
-          Sarthi can make mistakes. Consider checking important information.
+          Sarthi can take time to respond while taking notes or sorting through questions for you
         </p>
       </div>
     </div>
