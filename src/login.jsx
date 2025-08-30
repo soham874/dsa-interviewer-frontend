@@ -22,25 +22,25 @@ const Hero = ({ onLogin }) => (
       </div>
 
       <p className="text-2xl text-gray-300 mb-4 font-light">
-        Your AI Interviewer That Actually <span className="text-purple-400 font-semibold">Remembers</span>
+        Your AI Interviewer That Actually <span className="text-purple-400 font-semibold">Remembers</span> Your L's
       </p>
 
       <p className="text-xl text-gray-400 mb-12 max-w-3xl mx-auto leading-relaxed">
-        Stop getting rejected by FAANG. Train with an AI that's tougher than your actual interviewer
-        and tracks every mistake you make. No cap. 🔥
+        Built on LeetCode. Train with an AI that's more savage than your actual interviewer
+        while building your LC profile. For beginners to mid-level devs who want that FAANG bag 💰
       </p>
 
       <button
         onClick={onLogin}
         className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-8 py-4 rounded-2xl text-lg font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
       >
-        <span>Start Getting Roasted</span>
+        <span>Start Your Villain Arc</span>
         <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-purple-400 to-violet-400 opacity-0 group-hover:opacity-20 transition-opacity blur"></div>
       </button>
 
       <p className="text-sm text-gray-500 mt-4">
-        Sign in with Google to save your L's and W's
+        Sign in with Google to track your glow-up journey ✨
       </p>
     </div>
   </section>
@@ -52,22 +52,22 @@ const Features = () => {
     {
       icon: <Target className="w-8 h-8" />,
       title: "No Fake Nice Energy",
-      description: "Strict, professional vibes. Just like the real deal where one wrong move = instant rejection."
+      description: "Strict, professional vibes. Just like the real deal where one wrong answer = immediate rejection. We keep it 💯"
     },
     {
       icon: <Code2 className="w-8 h-8" />,
-      title: "All the Hard Stuff",
-      description: "Arrays, trees, graphs, DP, backtracking. We cover everything that makes you cry at 3 AM."
+      title: "LeetCode Integration",
+      description: "Built on LeetCode problems. Practice here = building your LC profile. Two birds, one stone fr fr 🎯"
     },
     {
       icon: <Brain className="w-8 h-8" />,
       title: "AI with Receipts",
-      description: "Remembers every time you fumbled. Adapts to expose your weak spots until you fix them."
+      description: "Remembers every time you fumbled. Adapts to expose your weak spots until you actually improve. No fake progress."
     },
     {
       icon: <TrendingUp className="w-8 h-8" />,
       title: "Actual Progress Tracking",
-      description: "Detailed scoring on understanding, approach, implementation, and optimization. No participation trophies."
+      description: "Detailed scoring on understanding, approach, implementation, and optimization. From beginner to mid-level beast mode."
     }
   ];
 
@@ -76,10 +76,10 @@ const Features = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white mb-6">
-            Why Sarthi Hits <span className="text-purple-400">Different</span>
+            Why Sarthi is the Main Character
           </h2>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Most practice tools are soft. Sarthi trains you for the real pressure where every second counts.
+            Most practice tools are giving participation trophy energy. Sarthi said "nah, we're built different" 😤
           </p>
         </div>
 
@@ -102,11 +102,11 @@ const Features = () => {
 // How It Works Component
 const HowItWorks = () => {
   const steps = [
-    { step: "01", title: "Get a Problem", description: "Sarthi serves you a LeetCode-style question that'll test your limits" },
-    { step: "02", title: "Explain Your Approach", description: "Talk through your solution. Sarthi will challenge every assumption" },
-    { step: "03", title: "Code in Java", description: "Write actual code. No pseudocode allowed. Sarthi runs tests in real-time" },
-    { step: "04", title: "Get Scored", description: "Receive brutal honest feedback on 4 dimensions. Know exactly where you stand" },
-    { step: "05", title: "Level Up", description: "Sarthi remembers everything and creates your personalized improvement plan" }
+    { step: "01", title: "Get Served a Problem", description: "Sarthi pulls a LeetCode question that'll humble you real quick. No tutorial island vibes here 💀" },
+    { step: "02", title: "Explain Your Big Brain Move", description: "Walk through your solution. Sarthi will fact-check your logic like it's personal" },
+    { step: "03", title: "Code or Get Coded", description: "Write actual Java. No pseudocode, no shortcuts. Sarthi runs tests and judges your entire existence" },
+    { step: "04", title: "Receive Your Report Card", description: "Get scored on 4 dimensions. Sometimes the truth hurts, but that's how we grow bestie 📈" },
+    { step: "05", title: "Unlock Your Next Level", description: "Sarthi remembers your weak spots and creates your personalized redemption arc plan" }
   ];
 
   return (
@@ -114,9 +114,9 @@ const HowItWorks = () => {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-16">
           <h2 className="text-5xl font-bold text-white mb-6">
-            How to Get <span className="text-violet-400">Humbled</span>
+            How to Transform into Your <span className="text-violet-400">Final Form</span>
           </h2>
-          <p className="text-xl text-gray-400">5 steps to go from zero to FAANG-ready (or realize you need more practice)</p>
+          <p className="text-xl text-gray-400">5 steps to go from noob to FAANG-ready (or discover you need to touch grass and study more)</p>
         </div>
 
         <div className="space-y-8">
@@ -143,10 +143,10 @@ const HowItWorks = () => {
 // Stats Component
 const Stats = () => {
   const stats = [
-    { number: "15+", label: "DSA Topics Covered", description: "Everything that matters" },
-    { number: "4", label: "Scoring Dimensions", description: "Comprehensive feedback" },
-    { number: "∞", label: "Problems Available", description: "Never run out of practice" },
-    { number: "100%", label: "Honest Feedback", description: "No sugar-coating allowed" }
+    { number: "15+", label: "DSA Topics Covered", description: "All the algorithms that matter" },
+    { number: "4", label: "Scoring Dimensions", description: "360° feedback, no blind spots" },
+    { number: "LC", label: "Profile Integration", description: "Built on LeetCode problems" },
+    { number: "24/7", label: "Available to Humble You", description: "AI never sleeps, neither should your grind" }
   ];
 
   return (
@@ -173,9 +173,10 @@ const WhyChoose = () => {
   const reasons = [
     "Real pressure, real consequences",
     "Remembers your fails and fixes them",
-    "Built for mid-level backend engineers",
+    "Session summaries after each session",
     "Zero handholding policy",
-    "Tracks progress like your manager tracks deadlines"
+    "Tracks progress like your manager tracks deadlines",
+    "Bro COOKS 💀"
   ];
 
   return (
@@ -196,9 +197,9 @@ const WhyChoose = () => {
 
         <div className="bg-gradient-to-r from-purple-800/30 to-violet-800/30 backdrop-blur-sm border border-purple-500/30 rounded-2xl p-8">
           <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-          <p className="text-2xl text-white font-semibold mb-2">Ready to Level Up?</p>
+          <p className="text-2xl text-white font-semibold mb-2">Ready to Touch Grass... After You Code?</p>
           <p className="text-gray-400">
-            Stop practicing on easy mode. Time to see if you've actually got what it takes.
+            Stop doom-scrolling and start algorithm-scrolling. Your LinkedIn needs this energy 🚀
           </p>
         </div>
       </div>
@@ -211,12 +212,12 @@ const CallToAction = ({ onLogin }) => (
   <section className="py-20 bg-gray-900 relative">
     <div className="max-w-4xl mx-auto px-6 text-center">
       <h2 className="text-5xl font-bold text-white mb-8">
-        Your FAANG Journey <span className="text-purple-400">Starts Here</span>
+        Your FAANG Arc <span className="text-purple-400">Starts Now</span>
       </h2>
 
       <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-        Join the ranks of engineers who stopped making excuses and started making progress.
-        Your future self will thank you (or blame you for waiting).
+        Join the devs who stopped making excuses and started making bank.
+        Your future self is either gonna thank you or question your entire existence 🤡
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
@@ -225,13 +226,13 @@ const CallToAction = ({ onLogin }) => (
           className="group relative inline-flex items-center gap-3 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-500 hover:to-violet-500 text-white px-10 py-5 rounded-2xl text-xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl hover:shadow-purple-500/25"
         >
           <Zap className="w-6 h-6" />
-          <span>Sign In with Google & Start Grinding</span>
+          <span>Sign In with Google & Lock In 🔒</span>
           <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
         </button>
       </div>
 
       <p className="text-sm text-gray-500 mt-6">
-        Free to start • No credit card required • Your progress is saved forever
+        Free to start • No credit card flexing required • Your progress gets saved to the cloud ☁️
       </p>
     </div>
   </section>
@@ -286,8 +287,11 @@ const SarthiLanding = () => {
             <Brain className="w-6 h-6 text-purple-400" />
             <span className="text-xl font-bold">Sarthi</span>
           </div>
-          <p className="text-gray-500">
-            Built for engineers who are serious about their craft. No shortcuts, just results.
+          <p className="text-gray-500 mb-3">
+            Built for engineers who are serious about securing the bag. No shortcuts, just results.
+          </p>
+          <p className="text-xs text-gray-600">
+            Made by Soham with Claude, Gemini & ChatGPT • Powered by caffeine and existential dread ☕
           </p>
         </div>
       </footer>
