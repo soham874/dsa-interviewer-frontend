@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import App from './App'
-import Login from './login'
+import SarthiLanding from './login'
 import { API_BASE_URL } from './config'
 import LoadingSpinner from './components/common/LoadingSpinner'
 import UserHomepage from './UserHomepage'
@@ -34,7 +34,7 @@ const AuthRouter = () => {
         return <LoadingSpinner/>
     }
 
-    return isAuthenticated ? <UserHomepage /> : <Login />
+    return isAuthenticated ? <UserHomepage /> : <SarthiLanding />
 }
 
 export default AuthRouter
