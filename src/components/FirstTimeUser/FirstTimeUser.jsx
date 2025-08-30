@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Rocket, Star, Code2, Sparkles } from 'lucide-react';
 import App from '../../App';
+import { API_BASE_URL } from '../../config';
+import { Brain, Sun, Moon, LogOut } from 'lucide-react';
 
 export default function FirstTimeUser({ darkMode }) {
   const [currentView, setCurrentView] = useState('login');
@@ -27,6 +29,13 @@ export default function FirstTimeUser({ darkMode }) {
     setCurrentView('App');
   };
 
+    const handleLogout = async () => {
+        await fetch(`${API_BASE_URL}/logout`, { method: "POST", credentials: "include" });
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.reload();
+      };
+
   return (
     <div className={`min-h-screen ${darkMode ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900' : 'bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50'} flex items-center justify-center p-4 relative overflow-hidden`}>
 
@@ -38,6 +47,16 @@ export default function FirstTimeUser({ darkMode }) {
       </div>
 
       <div className={`relative z-10 max-w-4xl w-full ${darkMode ? 'bg-slate-800/50 backdrop-blur-lg border-slate-700/50' : 'bg-white/80 backdrop-blur-lg border-white/40'} rounded-3xl p-8 md:p-12 border shadow-2xl text-center`}>
+        {/* Logout Button */}
+        <div className="absolute top-4 right-4">
+          <button
+            onClick={handleLogout}
+            className="group flex items-center gap-2 px-4 py-2 text-sm text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-xl transition-all duration-300 border border-red-400/20 hover:border-red-400/40 transform hover:scale-105"
+          >
+            <LogOut className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+            <span className="hidden sm:inline">Peace Out</span>
+          </button>
+        </div>
 
         {/* Hero Icon */}
         <div className="relative mb-8">
@@ -45,7 +64,7 @@ export default function FirstTimeUser({ darkMode }) {
             <Rocket className="w-16 h-16 text-white animate-pulse" />
             <div className="absolute inset-0 bg-gradient-to-t from-transparent to-white/20 animate-pulse"></div>
           </div>
-          <div className="absolute -top-2 -right-2">
+          <div>
             <Sparkles className="w-8 h-8 text-yellow-400 animate-bounce" />
           </div>
         </div>
