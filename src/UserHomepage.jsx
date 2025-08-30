@@ -7,6 +7,7 @@ import Header from './components/Header/Header';
 import OverviewStats from './components/OverviewStats/OverviewStats';
 import TopicProgressCards from './components/TopicProgress/TopicProgressCards';
 import UpcomingRevisions from './components/UpcomingRevisions/UpcomingRevisions';
+import { useTheme } from './components/common/ThemeProvider';
 
 
 export default function UserHomepage() {
@@ -14,8 +15,8 @@ export default function UserHomepage() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [darkMode, setDarkMode] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState(false);
+  const { darkMode, toggleDarkMode } = useTheme(); // Use theme from context
 
   useEffect(() => {
       const fetchReport = async () => {

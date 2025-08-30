@@ -1,7 +1,9 @@
 import React from 'react';
 import ThemeToggle from '../common/ThemeToggle';
+import { useTheme } from '../common/ThemeProvider';
 
-export default function ChatHeader({ darkMode, setDarkMode }) {
+export default function ChatHeader() {
+  const { darkMode, toggleDarkMode } = useTheme();
   return (
     <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 shadow-sm relative">
       <div className="flex items-center justify-between">

@@ -1,8 +1,10 @@
 import React from 'react';
 import { BarChart3, Sun, Moon } from 'lucide-react';
 import { API_BASE_URL } from '../../config';
+import { useTheme } from '../common/ThemeProvider';
 
-export default function Header({ darkMode, onDarkModeToggle }) {
+export default function Header() {
+  const { darkMode, toggleDarkMode } = useTheme();
 
     const handleLogout = async () => {
         await fetch(`${API_BASE_URL}/logout`, { method: "POST", credentials: "include" });
@@ -23,7 +25,7 @@ export default function Header({ darkMode, onDarkModeToggle }) {
               Learning Progress
             </h1>
             <button
-              onClick={onDarkModeToggle}
+              onClick={toggleDarkMode}
               className={`p-2 rounded-lg transition-colors ${darkMode ? 'bg-slate-700 hover:bg-slate-600 text-yellow-400' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'} ml-3`}
             >
               {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}

@@ -1,13 +1,14 @@
 import React, { useRef } from 'react';
 import CodeEditorHeader from './CodeEditorHeader';
+import { useTheme } from '../common/ThemeProvider';
 
 export default function CodeEditor({
-  darkMode,
   noteText,
   setNoteText,
   attachCode,
   handleCodeEditorKeyDown
 }) {
+  const { darkMode } = useTheme();
   const codeEditorRef = useRef(null);
 
   return (
