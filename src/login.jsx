@@ -155,7 +155,7 @@ const Stats = () => {
         <div className="grid md:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
             <div key={index} className="text-center group">
-              <div className="text-5xl font-black text-transparent bg-gradient-to-b from-purple-400 to-violet-600 bg-clip-text mb-4 group-hover:scale-110 transition-transform duration-300">
+              <div className="text-5xl font-black bg-gradient-to-b from-purple-400 to-violet-600 bg-clip-text mb-4 group-hover:scale-110 transition-transform duration-300">
                 {stat.number}
               </div>
               <h3 className="text-xl font-bold text-white mb-2">{stat.label}</h3>
@@ -183,7 +183,7 @@ const WhyChoose = () => {
     <section className="py-20 bg-gradient-to-r from-gray-900 via-purple-900/20 to-gray-900">
       <div className="max-w-6xl mx-auto px-6 text-center">
         <h2 className="text-5xl font-bold text-white mb-12">
-          Why Sarthi > Everything Else
+          Why Sarthi &gt; Everything Else
         </h2>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
