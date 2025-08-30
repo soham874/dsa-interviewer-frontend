@@ -145,7 +145,7 @@ const Stats = () => {
   const stats = [
     { number: "15+", label: "DSA Topics Covered", description: "All the algorithms that matter" },
     { number: "4", label: "Scoring Dimensions", description: "360° feedback, no blind spots" },
-    { number: "LC", label: "Profile Integration", description: "Built on LeetCode problems" },
+    { number: "LeetCode", label: "Profile Integration", description: "Built on LeetCode problems" },
     { number: "24/7", label: "Available to Humble You", description: "AI never sleeps, neither should your grind" }
   ];
 
