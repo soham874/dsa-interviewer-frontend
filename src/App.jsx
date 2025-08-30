@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import ChatSection from './components/Chat/ChatSection';
 import CodeEditor from './components/CodeEditor/CodeEditor';
 import { API_BASE_URL } from './config';
+import { useTheme } from './components/common/ThemeProvider';
 
 export default function App() {
   const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
@@ -10,10 +11,10 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [attachCode, setAttachCode] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
   const codeEditorRef = useRef(null);
+  const { darkMode } = useTheme();
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -201,8 +202,6 @@ export default function App() {
       ? 'bg-gradient-to-br from-gray-900 to-slate-800'
       : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
       <ChatSection
-        darkMode={darkMode}
-        setDarkMode={setDarkMode}
         messages={messages}
         isLoading={isLoading}
         input={input}
@@ -216,7 +215,6 @@ export default function App() {
         chatEndRef={chatEndRef}
       />
       <CodeEditor
-        darkMode={darkMode}
         noteText={noteText}
         setNoteText={setNoteText}
         attachCode={attachCode}
