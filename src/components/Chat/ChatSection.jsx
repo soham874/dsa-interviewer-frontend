@@ -19,14 +19,14 @@ export default function ChatSection({
 }) {
   const { darkMode, toggleDarkMode } = useTheme();
   return (
-    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden ${darkMode
-      ? 'bg-gray-800 border border-gray-700'
-      : 'bg-white border border-slate-100'}`}>
+    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${darkMode
+      ? 'bg-slate-800/50 border border-slate-700/50'
+      : 'bg-white/80 border border-white/40'}`}>
       <ChatHeader />
 
       {/* Chat Messages */}
       <div className={`flex-1 overflow-y-auto p-4 ${darkMode
-        ? 'bg-gray-800/50'
+        ? 'bg-slate-800/30'
         : 'bg-slate-50/30'}`}>
         <ChatMessages
           messages={messages}

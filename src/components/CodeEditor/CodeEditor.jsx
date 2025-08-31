@@ -12,16 +12,16 @@ export default function CodeEditor({
   const codeEditorRef = useRef(null);
 
   return (
-    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden ${
+    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${
       darkMode
-        ? 'bg-gray-800 border border-gray-700'
-        : 'bg-white border border-slate-100'
+        ? 'bg-slate-800/50 border border-slate-700/50'
+        : 'bg-white/80 border border-white/40'
     }`}>
       {/* Header */}
       <div className={`p-6 shadow-sm ${
         darkMode
-          ? 'bg-gradient-to-r from-gray-800 to-slate-900'
-          : 'bg-gradient-to-r from-slate-700 to-slate-800'
+          ? 'bg-gradient-to-r from-slate-800 to-purple-900'
+          : 'bg-gradient-to-r from-slate-700 to-purple-800'
       } text-white`}>
         <CodeEditorHeader noteText={noteText} attachCode={attachCode} />
       </div>
@@ -29,7 +29,7 @@ export default function CodeEditor({
       {/* Editor Area */}
       <div className={`flex-1 p-6 ${
         darkMode
-          ? 'bg-gradient-to-br from-gray-900 to-gray-800'
+          ? 'bg-gradient-to-br from-slate-900 to-slate-800'
           : 'bg-gradient-to-br from-slate-50 to-slate-100'
       }`}>
         <div className="h-full relative">

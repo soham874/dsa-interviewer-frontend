@@ -198,9 +198,9 @@ export default function App() {
   };
 
   return (
-    <div className={`flex h-screen p-4 gap-4 ${darkMode
-      ? 'bg-gradient-to-br from-gray-900 to-slate-800'
-      : 'bg-gradient-to-br from-slate-50 to-blue-50'}`}>
+        <div className={`flex h-screen p-4 gap-4 ${darkMode
+      ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900'
+      : 'bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50'}`}>
       <ChatSection
         messages={messages}
         isLoading={isLoading}

@@ -208,8 +208,10 @@ export default function UserHomepage() {
               } text-white rounded-2xl font-bold text-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden`}
             >
               <span className="relative z-10 flex items-center gap-3">
-                <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300" />
-                Continue Your Villain Arc
+                <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 " />
+                <div className={`font-black ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                    Continue Your Villain Arc
+                </div>
                 <Sparkles className="w-5 h-5 group-hover:animate-spin" />
               </span>
               <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
