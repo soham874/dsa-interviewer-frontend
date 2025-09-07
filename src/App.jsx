@@ -56,7 +56,8 @@ export default function App() {
       sender: "user",
       text: input,
       hasAttachedCode: hasAttachedCode,
-      attachedCode: hasAttachedCode ? noteText : null
+      attachedCode: hasAttachedCode ? noteText : null,
+      timestamp: new Date().toISOString()
     };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -87,6 +88,7 @@ export default function App() {
           updated[updated.length - 1] = {
             ...updated[updated.length - 1],
             text: newText,
+            timestamp: updated[updated.length - 1].timestamp,
           };
           return updated;
         });
@@ -97,7 +99,19 @@ export default function App() {
 
       while (true) {
         const { value, done } = await reader.read();
-        if (done) break;
+        if (done) {
+          // Add timestamp when streaming is complete
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              ...updated[updated.length - 1],
+              text: fullResponse,
+              timestamp: new Date().toISOString()
+            };
+            return updated;
+          });
+          break;
+        }
 
         // Decode the chunk and add to buffer
         buffer += decoder.decode(value, { stream: true });
@@ -130,7 +144,16 @@ export default function App() {
             const data = dataLines.join('\n');
 
             if (eventType === 'end' || data.trim() === 'end') {
-              // Stream ended
+              // Stream ended, add timestamp
+              setMessages((prev) => {
+                const updated = [...prev];
+                updated[updated.length - 1] = {
+                  ...updated[updated.length - 1],
+                  text: fullResponse,
+                  timestamp: new Date().toISOString()
+                };
+                return updated;
+              });
               break;
             } else {
               // Regular data chunk - handle escaped newlines
@@ -139,6 +162,7 @@ export default function App() {
                 chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
               }
               fullResponse += chunk;
+              // Update without timestamp during streaming
               updateAssistantMessage(fullResponse);
             }
           }
@@ -163,14 +187,24 @@ export default function App() {
             chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
           }
           fullResponse += chunk;
-          updateAssistantMessage(fullResponse);
+          // Final update with timestamp
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              ...updated[updated.length - 1],
+              text: fullResponse,
+              timestamp: new Date().toISOString()
+            };
+            return updated;
+          });
         }
       }
     } catch (error) {
       console.error("Error:", error);
       setMessages((prev) => [...prev, {
         sender: "assistant",
-        text: "Sorry, I encountered an error. Please try again."
+        text: "Sorry, I encountered an error. Please try again.",
+        timestamp: new Date().toISOString()
       }]);
     } finally {
       setIsLoading(false);

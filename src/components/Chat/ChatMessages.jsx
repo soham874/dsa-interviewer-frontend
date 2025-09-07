@@ -51,6 +51,9 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
                   <div className="prose prose-invert max-w-none text-white text-sm prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4">
                     <MarkdownRenderer content={msg.text} darkMode={true} />
                   </div>
+                  <div className="mt-2 text-xs text-blue-200 text-right">
+                    {new Date(msg.timestamp).toLocaleString()}
+                  </div>
                 </div>
 
                 {/* Code Attachment for User */}
@@ -86,12 +89,17 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
                 )}
               </div>
             ) : (
-              <div className={`prose max-w-none text-sm ${
-                darkMode
-                  ? 'prose-invert text-gray-200 prose-headings:text-gray-100 prose-a:text-blue-400 prose-strong:text-gray-100 prose-li:marker:text-gray-400'
-                  : 'prose-slate text-slate-800 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900'
-              } prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4`}>
-                <MarkdownRenderer content={msg.text} darkMode={darkMode} />
+              <div>
+                <div className={`prose max-w-none text-sm ${
+                  darkMode
+                    ? 'prose-invert text-gray-200 prose-headings:text-gray-100 prose-a:text-blue-400 prose-strong:text-gray-100 prose-li:marker:text-gray-400'
+                    : 'prose-slate text-slate-800 prose-headings:text-slate-900 prose-a:text-blue-600 prose-strong:text-slate-900'
+                } prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4`}>
+                  <MarkdownRenderer content={msg.text} darkMode={darkMode} />
+                </div>
+                <div className={`mt-2 text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {new Date(msg.timestamp).toLocaleString()}
+                </div>
               </div>
             )}
           </div>
