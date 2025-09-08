@@ -1,7 +1,9 @@
 import { API_BASE_URL } from './config';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Code2, Brain, Target, TrendingUp, Zap, Trophy, ArrowRight, CheckCircle } from 'lucide-react';
+import { Users, Clock, Flame, Star, Coffee } from 'lucide-react';
+import { useTheme } from './components/common/ThemeProvider';
 
 // Hero Component
 const Hero = ({ onLogin }) => (
@@ -168,6 +170,99 @@ const Stats = () => {
   );
 };
 
+const ServiceStatsSection = ({ darkMode,statsLoading,serviceStats }) => (
+  <div className="mb-12 ">
+    <div className="text-center mb-16 ">
+    <h2 className={`text-5xl font-black ${darkMode ? 'text-white' : 'text-gray-800 '} mb-3`}>
+      The <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 mx-1">Numbers</span> Don't Lie 📊
+    </h2>
+      <p className={`text-lg ${darkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+        Check out how we're absolutely crushing it out here 🔥
+      </p>
+    </div>
+
+    <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      {/* Sessions Conducted */}
+      <div className={`${
+        darkMode
+          ? 'bg-gradient-to-br from-slate-800/50 to-purple-900/20 border-slate-700/50'
+          : 'bg-white/80 border-gray-200'
+      } backdrop-blur-sm border rounded-2xl p-8 text-center transform hover:scale-105 transition-all duration-300 hover:shadow-xl ${
+        darkMode ? 'hover:shadow-purple-500/10' : 'hover:shadow-purple-500/20'
+      }`}>
+        <div className={`w-20 h-20 mx-auto mb-6 rounded-full ${
+          darkMode
+            ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-500/30'
+            : 'bg-gradient-to-br from-purple-100 to-pink-100 border border-purple-200'
+        } flex items-center justify-center`}>
+          <Zap className={`w-10 h-10 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+        </div>
+
+        <div className="relative">
+          {statsLoading ? (
+            <div className={`w-16 h-16 mx-auto mb-4 border-4 ${
+              darkMode ? 'border-purple-500/20 border-t-purple-400' : 'border-purple-200 border-t-purple-500'
+            } rounded-full animate-spin`}></div>
+          ) : (
+            <div className={`text-5xl font-black mb-2 ${
+              darkMode
+                ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400'
+                : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600'
+            }`}>
+              {serviceStats.sessionConducted}
+            </div>
+          )}
+          <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2`}>
+            Study Sessions
+          </h3>
+          <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+            Brain cells have been absolutely demolished 🧠💥
+          </p>
+        </div>
+      </div>
+
+      {/* User Count */}
+      <div className={`${
+        darkMode
+          ? 'bg-gradient-to-br from-slate-800/50 to-pink-900/20 border-slate-700/50'
+          : 'bg-white/80 border-gray-200'
+      } backdrop-blur-sm border rounded-2xl p-8 text-center transform hover:scale-105 transition-all duration-300 hover:shadow-xl ${
+        darkMode ? 'hover:shadow-pink-500/10' : 'hover:shadow-pink-500/20'
+      }`}>
+        <div className={`w-20 h-20 mx-auto mb-6 rounded-full ${
+          darkMode
+            ? 'bg-gradient-to-br from-pink-500/20 to-purple-500/20 border border-pink-500/30'
+            : 'bg-gradient-to-br from-pink-100 to-purple-100 border border-pink-200'
+        } flex items-center justify-center`}>
+          <Users className={`w-10 h-10 ${darkMode ? 'text-pink-400' : 'text-pink-600'}`} />
+        </div>
+
+        <div className="relative">
+          {statsLoading ? (
+            <div className={`w-16 h-16 mx-auto mb-4 border-4 ${
+              darkMode ? 'border-pink-500/20 border-t-pink-400' : 'border-pink-200 border-t-pink-500'
+            } rounded-full animate-spin`}></div>
+          ) : (
+            <div className={`text-5xl font-black mb-2 ${
+              darkMode
+                ? 'text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-purple-400'
+                : 'text-transparent bg-clip-text bg-gradient-to-r from-pink-600 to-purple-600'
+            }`}>
+              {serviceStats.userCount}
+            </div>
+          )}
+          <h3 className={`text-xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'} mb-2`}>
+            Elite Users
+          </h3>
+          <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+            The chosen few who actually grind 😤⚡
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+);
+
 // Why Choose Component
 const WhyChoose = () => {
   const reasons = [
@@ -240,6 +335,40 @@ const CallToAction = ({ onLogin }) => (
 
 // Main Landing Page Component
 const SarthiLanding = () => {
+
+const [serviceStats, setServiceStats] = useState({ sessionConducted: 0, userCount: 0 });
+const [statsLoading, setStatsLoading] = useState(true);
+const { darkMode, toggleDarkMode } = useTheme();
+
+useEffect(() => {
+      const fetchServiceStats = async () => {
+        try {
+          setStatsLoading(true);
+          const response = await fetch(`${API_BASE_URL}/service_stats`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+              'Accept': 'application/json'
+            }
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            setServiceStats(data);
+          } else {
+            // Fallback data if API fails
+            setServiceStats({ sessionConducted: 12, userCount: 3 });
+          }
+        } catch (err) {
+          // Fallback data if API fails
+          setServiceStats({ sessionConducted: 12, userCount: 3 });
+        } finally {
+          setStatsLoading(false);
+        }
+      };
+
+      fetchServiceStats();
+    }, []);
   const handleGoogleLogin = () => {
     window.location.href = `${API_BASE_URL}/login/google`;
   };
@@ -273,6 +402,8 @@ const SarthiLanding = () => {
 
       {/* Stats Section */}
       <Stats />
+
+      <ServiceStatsSection darkMode={darkMode} statsLoading={statsLoading} serviceStats={serviceStats}/>
 
       {/* Why Choose Section */}
       <WhyChoose />
