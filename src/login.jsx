@@ -270,8 +270,7 @@ const WhyChoose = () => {
     "Remembers your fails and fixes them",
     "Session summaries after each session",
     "Zero handholding policy",
-    "Tracks progress like your manager tracks deadlines",
-    "Bro COOKS 💀"
+    "Tracks progress like your manager tracks deadlines"
   ];
 
   return (
@@ -346,7 +345,6 @@ useEffect(() => {
           setStatsLoading(true);
           const response = await fetch(`${API_BASE_URL}/service_stats`, {
             method: 'GET',
-            credentials: 'include',
             headers: {
               'Accept': 'application/json'
             }

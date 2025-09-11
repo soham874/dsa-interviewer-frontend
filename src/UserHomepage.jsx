@@ -8,7 +8,7 @@ import OverviewStats from './components/OverviewStats/OverviewStats';
 import TopicProgressCards from './components/TopicProgress/TopicProgressCards';
 import UpcomingRevisions from './components/UpcomingRevisions/UpcomingRevisions';
 import { useTheme } from './components/common/ThemeProvider';
-import { Rocket, Smartphone, Lock, Sparkles } from 'lucide-react';
+import { Rocket, Smartphone, Lock, Sparkles, MessageSquare, TrendingUp, Zap } from 'lucide-react';
 
 export default function UserHomepage() {
   const [currentView, setCurrentView] = useState('login');
@@ -113,6 +113,54 @@ export default function UserHomepage() {
     </div>
   );
 
+  const StartSessionButton = ({ className = "", size = "default" }) => {
+    const baseClasses = `group ${
+      darkMode
+        ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400'
+        : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
+    } text-white rounded-2xl font-bold transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden`;
+
+    const sizeClasses = size === "compact"
+      ? "px-6 py-3 text-base"
+      : "px-10 py-5 text-xl";
+
+    if (isMobile) {
+      return (
+        <div className={`${darkMode ? 'bg-orange-900/20 border-orange-800/50' : 'bg-orange-100 border-orange-200'} border rounded-2xl p-6 text-center ${className}`}>
+          <div className="mb-3">
+            <Smartphone className="w-12 h-12 mx-auto text-orange-400 mb-2" />
+            <Lock className="w-6 h-6 mx-auto text-red-400" />
+          </div>
+          <h3 className={`text-lg font-bold ${darkMode ? 'text-orange-400' : 'text-orange-600'} mb-2`}>
+            Yo, Hold Up! 🛑
+          </h3>
+          <p className={`${darkMode ? 'text-orange-300' : 'text-orange-700'} text-sm mb-1`}>
+            You really thought you could code on a phone?
+          </p>
+          <p className={`text-xs ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
+            Get on a laptop/desktop and come back 💻✨
+          </p>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        onClick={handleStartSession}
+        className={`${baseClasses} ${sizeClasses} ${className}`}
+      >
+        <span className="relative z-10 flex items-center gap-3">
+          <Rocket className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" />
+          <span className="font-black">
+            {size === "compact" ? "Start Session" : "Continue Your Villain Arc"}
+          </span>
+          <Sparkles className="w-4 h-4 group-hover:animate-spin" />
+        </span>
+        <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
+      </button>
+    );
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -151,11 +199,60 @@ export default function UserHomepage() {
       <Header darkMode={darkMode} onDarkModeToggle={() => setDarkMode(!darkMode)} />
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Top CTA Section */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-6 mb-6">
+            <div className="text-center lg:text-left">
+              <h1 className={`text-4xl md:text-5xl font-black ${darkMode ? 'text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-pink-400 to-purple-400' : 'text-transparent bg-clip-text bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600'} mb-2`}>
+                Welcome Back, Warrior!
+              </h1>
+              <p className={`text-lg ${darkMode ? 'text-slate-400' : 'text-gray-600'}`}>
+                Ready to demolish some algorithms? Let's get this bread 🍞
+              </p>
+            </div>
+            <div className="flex-shrink-0">
+              <StartSessionButton size="compact" />
+            </div>
+          </div>
+        </div>
+
         <OverviewStats
           darkMode={darkMode}
           report={report}
           formatDate={formatDate}
         />
+
+        {/* Overall Feedback Section */}
+        {report.overall_feedback && (
+          <div className="mb-8">
+            <div className={`${darkMode ? 'bg-gradient-to-br from-slate-800/60 to-purple-900/20 border-slate-700/50' : 'bg-gradient-to-br from-white to-purple-50/30 border-purple-200/30'} backdrop-blur-sm border rounded-3xl p-6 md:p-8 shadow-xl`}>
+              <div className="flex items-start gap-4 mb-4">
+                <div className={`${darkMode ? 'bg-gradient-to-br from-purple-500/20 to-pink-500/20 border-purple-400/30' : 'bg-gradient-to-br from-purple-100 to-pink-100 border-purple-300'} border rounded-2xl p-3 flex-shrink-0`}>
+                  <MessageSquare className={`w-6 h-6 ${darkMode ? 'text-purple-400' : 'text-purple-600'}`} />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-3">
+                    <h2 className={`text-2xl font-black ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                      What Sarthi thinks about you ...
+                    </h2>
+                    <TrendingUp className={`w-5 h-5 ${darkMode ? 'text-green-400' : 'text-green-600'}`} />
+                  </div>
+                  <div className={`${darkMode ? 'bg-slate-800/50 border-slate-700/30' : 'bg-white/60 border-gray-200/50'} border rounded-2xl p-4 backdrop-blur-sm`}>
+                    <p className={`${darkMode ? 'text-slate-300' : 'text-gray-700'} leading-relaxed text-base`}>
+                      {report.overall_feedback}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2 mt-3">
+                    <Zap className={`w-4 h-4 ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`} />
+                    <span className={`text-sm font-medium ${darkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
+                      AI-powered insights to fuel your growth 🚀
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         <TopicProgressCards
           darkMode={darkMode}
@@ -171,7 +268,7 @@ export default function UserHomepage() {
           formatDate={formatDate}
         />
 
-        {/* Enhanced CTA Section */}
+        {/* Bottom Enhanced CTA Section */}
         <div className="text-center mb-8">
           <h2 className={`text-3xl font-black ${darkMode ? 'text-white' : 'text-gray-800'} mb-4`}>
             Ready to <span className="text-purple-400">Lock In?</span>
@@ -182,41 +279,7 @@ export default function UserHomepage() {
         </div>
 
         <div className="flex flex-col items-center justify-center">
-          {isMobile ? (
-            <div className={`${darkMode ? 'bg-orange-900/20 border-orange-800/50' : 'bg-orange-100 border-orange-200'} border rounded-2xl p-8 max-w-lg text-center`}>
-              <div className="mb-4">
-                <Smartphone className="w-16 h-16 mx-auto text-orange-400 mb-3" />
-                <Lock className="w-8 h-8 mx-auto text-red-400" />
-              </div>
-              <h3 className={`text-xl font-bold ${darkMode ? 'text-orange-400' : 'text-orange-600'} mb-3`}>
-                Yo, Hold Up! 🛑
-              </h3>
-              <p className={`${darkMode ? 'text-orange-300' : 'text-orange-700'} mb-2`}>
-                You really thought you could code on a phone? That's not it chief 📵
-              </p>
-              <p className={`text-sm ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
-                Get on a laptop/desktop and come back when you're serious about this grind 💻✨
-              </p>
-            </div>
-          ) : (
-            <button
-              onClick={handleStartSession}
-              className={`group px-10 py-5 ${
-                darkMode
-                  ? 'bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-400 hover:to-pink-400'
-                  : 'bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500'
-              } text-white rounded-2xl font-bold text-xl transition-all duration-300 transform hover:scale-110 shadow-lg hover:shadow-2xl hover:shadow-purple-500/25 relative overflow-hidden`}
-            >
-              <span className="relative z-10 flex items-center gap-3">
-                <Rocket className="w-6 h-6 group-hover:rotate-12 transition-transform duration-300 " />
-                <div className={`font-black ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                    Continue Your Villain Arc
-                </div>
-                <Sparkles className="w-5 h-5 group-hover:animate-spin" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 opacity-0 group-hover:opacity-30 transition-opacity duration-300"></div>
-            </button>
-          )}
+          <StartSessionButton />
 
           {!isMobile && (
             <p className={`text-sm ${darkMode ? 'text-slate-500' : 'text-gray-400'} mt-4`}>
