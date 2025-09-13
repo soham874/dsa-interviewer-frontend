@@ -7,8 +7,9 @@ import Header from './components/Header/Header';
 import OverviewStats from './components/OverviewStats/OverviewStats';
 import TopicProgressCards from './components/TopicProgress/TopicProgressCards';
 import UpcomingRevisions from './components/UpcomingRevisions/UpcomingRevisions';
+import SessionReports from './components/SessionReports/SessionReports';
 import { useTheme } from './components/common/ThemeProvider';
-import { Rocket, Smartphone, Lock, Sparkles, MessageSquare, TrendingUp, Zap } from 'lucide-react';
+import { Rocket, Smartphone, Lock, Sparkles, MessageSquare, TrendingUp, Zap, BarChart3 } from 'lucide-react';
 
 export default function UserHomepage() {
   const [currentView, setCurrentView] = useState('login');
@@ -17,6 +18,7 @@ export default function UserHomepage() {
   const [error, setError] = useState(null);
   const [isFirstTime, setIsFirstTime] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [showSessionReports, setShowSessionReports] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
 
   useEffect(() => {
@@ -210,7 +212,7 @@ export default function UserHomepage() {
                 Ready to demolish some algorithms? Let's get this bread 🍞
               </p>
             </div>
-            <div className="flex-shrink-0">
+            <div className="flex-shrink-0 flex gap-3">
               <StartSessionButton size="compact" />
             </div>
           </div>
@@ -261,6 +263,10 @@ export default function UserHomepage() {
           getStrengthColor={getStrengthColor}
           getPriorityColor={getPriorityColor}
         />
+
+        <div className="mb-8">
+            <SessionReports darkMode={darkMode} />
+          </div>
 
         <UpcomingRevisions
           darkMode={darkMode}
