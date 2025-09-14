@@ -23,7 +23,7 @@ export default function CodeEditor({
           ? 'bg-gradient-to-r from-slate-800 to-purple-900'
           : 'bg-gradient-to-r from-slate-700 to-purple-800'
       } text-white`}>
-        <CodeEditorHeader noteText={noteText} attachCode={attachCode} />
+        <CodeEditorHeader noteText={noteText} attachCode={attachCode} onBackToHome/>
       </div>
 
       {/* Editor Area */}
