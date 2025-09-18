@@ -72,7 +72,7 @@ export default function App() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent }),
+        body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent, mode: "DSA" }),
       });
 
       const reader = response.body.getReader();
