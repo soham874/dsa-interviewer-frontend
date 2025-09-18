@@ -26,12 +26,12 @@ const OverviewTab = ({
           </h3>
         </div>
         
-        <div className={`${
-          darkMode 
-            ? 'bg-slate-800/60 border border-slate-700/50' 
+        <div className={`text-center ${
+          darkMode
+            ? 'bg-slate-800/60 border border-slate-700/50'
             : 'bg-white border border-gray-200'
         } rounded-2xl p-6 backdrop-blur-sm`}>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-2">
             <Target className="w-5 h-5 text-purple-400" />
             <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               {currentReport.questions?.length || 0}
@@ -42,12 +42,12 @@ const OverviewTab = ({
           </h3>
         </div>
 
-        <div className={`${
+        <div className={`text-center ${
           darkMode 
             ? 'bg-slate-800/60 border border-slate-700/50' 
             : 'bg-white border border-gray-200'
         } rounded-2xl p-6 backdrop-blur-sm`}>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-2">
             <BookOpen className="w-5 h-5 text-blue-400" />
             <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               {currentReport.topics_attempted?.length || 0}
@@ -58,12 +58,12 @@ const OverviewTab = ({
           </h3>
         </div>
 
-        <div className={`${
+        <div className={`text-center ${
           darkMode 
             ? 'bg-slate-800/60 border border-slate-700/50' 
             : 'bg-white border border-gray-200'
         } rounded-2xl p-6 backdrop-blur-sm`}>
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center justify-center gap-3 mb-2">
             <Flame className="w-5 h-5 text-orange-400" />
             <span className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
               {currentReport.strengths?.length || 0}
@@ -87,10 +87,10 @@ const OverviewTab = ({
         </h3>
         <div className="flex items-center justify-between">
           {sessionReports.slice(0, 5).map((report, index) => (
-            <div key={index} className="text-center">
+            <div key={index} className="flex flex-col items-center justify-center">
               <div className={`w-12 h-12 rounded-full border-2 flex items-center justify-center mb-2 ${
-                index === currentSession 
-                  ? 'border-purple-400 bg-purple-500/20' 
+                index === currentSession
+                  ? 'border-purple-400 bg-purple-500/20'
                   : darkMode
                     ? 'border-slate-600 bg-slate-800'
                     : 'border-gray-300 bg-gray-100'
@@ -101,7 +101,7 @@ const OverviewTab = ({
                   {report.overall_score.toFixed(1)}
                 </span>
               </div>
-              <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+              <p className={`text-xs text-center ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
                 {formatDate(report.created_at)}
               </p>
             </div>
