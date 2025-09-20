@@ -8,6 +8,7 @@ import OverviewStats from './components/OverviewStats/OverviewStats';
 import TopicProgressCards from './components/TopicProgress/TopicProgressCards';
 import UpcomingRevisions from './components/UpcomingRevisions/UpcomingRevisions';
 import SessionReports from './components/SessionReports/SessionReports';
+import IncompleteSessionsSection from './components/IncompleteSessions/IncompleteSessionsSection';
 import { useTheme } from './components/common/ThemeProvider';
 import { Rocket, Smartphone, Lock, Sparkles, MessageSquare, TrendingUp, Zap, BarChart3 } from 'lucide-react';
 
@@ -20,6 +21,7 @@ export default function UserHomepage() {
   const [isMobile, setIsMobile] = useState(false);
   const [showSessionReports, setShowSessionReports] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
+  const [incompleteSessions, setIncompleteSessions] = useState([]);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -32,7 +34,7 @@ export default function UserHomepage() {
   }, []);
 
   useEffect(() => {
-    const fetchReport = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
         const response = await fetch(`${API_BASE_URL}/user_report`, {
@@ -57,6 +59,9 @@ export default function UserHomepage() {
         } else {
           setIsFirstTime(true);
         }
+
+        await fetchIncompleteSessions();
+
       } catch (err) {
         setError(err.message || 'Failed to load report');
       } finally {
@@ -64,7 +69,7 @@ export default function UserHomepage() {
       }
     };
 
-    fetchReport();
+    fetchData();
   }, []);
 
   const formatDate = (dateString) => {
@@ -74,6 +79,40 @@ export default function UserHomepage() {
       year: 'numeric'
     });
   };
+
+const fetchIncompleteSessions = async () => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/latest_incomplete_sessions`, {
+      method: 'GET',
+      credentials: 'include',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      setIncompleteSessions(data);
+    }
+  } catch (err) {
+    console.log('Failed to fetch incomplete sessions:', err);
+    // Don't set error state since this is not critical
+  }
+};
+
+    // 4. Add this function to handle resuming sessions (add after fetchIncompleteSessions)
+const handleResumeSession = (sessionId) => {
+  // You'll need to implement session resuming logic here
+  // For now, this could navigate to your App component with the session ID
+  console.log('Resuming session:', sessionId);
+
+  // Example: You might want to pass the session ID to your App component
+  // or store it in state/context so the App component knows to resume this session
+  setCurrentView('App');
+
+  // If you need to pass the session ID, you could modify your state management
+  // or use React Router with parameters
+};
 
   const getStrengthColor = (level) => {
     const colors = {
@@ -255,6 +294,13 @@ export default function UserHomepage() {
             </div>
           </div>
         )}
+
+        <IncompleteSessionsSection
+          darkMode={darkMode}
+          incompleteSessions={incompleteSessions}
+          formatDate={formatDate}
+          onResumeSession={handleResumeSession}
+        />
 
         <TopicProgressCards
           darkMode={darkMode}
