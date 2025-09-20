@@ -22,6 +22,7 @@ export default function UserHomepage() {
   const [showSessionReports, setShowSessionReports] = useState(false);
   const { darkMode, toggleDarkMode } = useTheme();
   const [incompleteSessions, setIncompleteSessions] = useState([]);
+  const [sessionId, setSessionId] = useState(null);
 
   useEffect(() => {
     const checkMobile = () => {
@@ -105,7 +106,7 @@ const handleResumeSession = (sessionId) => {
   // You'll need to implement session resuming logic here
   // For now, this could navigate to your App component with the session ID
   console.log('Resuming session:', sessionId);
-
+    setSessionId(sessionId);
   // Example: You might want to pass the session ID to your App component
   // or store it in state/context so the App component knows to resume this session
   setCurrentView('App');
@@ -221,7 +222,7 @@ const handleResumeSession = (sessionId) => {
   }
 
   if (currentView === 'App') {
-    return <App />;
+    return <App sessionId={sessionId} />;
   }
 
   if (isFirstTime || !report) {
@@ -232,6 +233,7 @@ const handleResumeSession = (sessionId) => {
     if (isMobile) {
       return;
     }
+    setSessionId(null); // New session
     setCurrentView('App');
   };
 

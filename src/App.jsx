@@ -4,7 +4,7 @@ import CodeEditor from './components/CodeEditor/CodeEditor';
 import { API_BASE_URL } from './config';
 import { useTheme } from './components/common/ThemeProvider';
 
-export default function App() {
+export default function App({ sessionId }) {
   const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
@@ -34,9 +34,14 @@ export default function App() {
 
   useEffect(() => {
     // Refresh token on page reload
-    const newUuid = crypto.randomUUID();
+    var newUuid = sessionId
+    if( newUuid === null ){
+        newUuid = crypto.randomUUID();
+    }
     setSessionUuid(newUuid);
     localStorage.setItem('session_uuid', newUuid);
+    console.log('Session ID->', localStorage.getItem('session_uuid'));
+
   }, []);
 
   const sendMessage = async (e) => {
