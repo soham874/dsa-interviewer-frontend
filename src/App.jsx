@@ -4,11 +4,12 @@ import CodeEditor from './components/CodeEditor/CodeEditor';
 import { API_BASE_URL } from './config';
 import { useTheme } from './components/common/ThemeProvider';
 
-export default function App() {
+export default function App({ sessionId }) {
   const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingSession, setIsLoadingSession] = useState(false);
   const [noteText, setNoteText] = useState("");
   const [attachCode, setAttachCode] = useState(false);
   const chatEndRef = useRef(null);
@@ -32,12 +33,52 @@ export default function App() {
     }
   }, [input]);
 
+  // Load session details
+  const loadSessionDetails = async (uuid) => {
+    try {
+      setIsLoadingSession(true);
+      const response = await fetch(`${API_BASE_URL}/load_session_details/${uuid}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.message_list && Array.isArray(data.message_list)) {
+          // Transform the messages from backend format to frontend format
+          const transformedMessages = data.message_list.map(msg => ({
+            sender: msg.role === 'user' ? 'user' : 'assistant',
+            text: msg.content,
+            timestamp: msg.timestamp || new Date().toISOString(),
+            hasAttachedCode: msg.hasAttachedCode || false,
+            attachedCode: msg.attachedCode || null
+          }));
+          setMessages(transformedMessages);
+        }
+      } else {
+        console.error('Failed to load session details:', response.status);
+      }
+    } catch (error) {
+      console.error("Error loading session details:", error);
+    } finally {
+      setIsLoadingSession(false);
+    }
+  };
+
   useEffect(() => {
-    // Refresh token on page reload
-    const newUuid = crypto.randomUUID();
+    // Initialize session and load details
+    let newUuid = sessionId;
+    if (newUuid === null) {
+      newUuid = crypto.randomUUID();
+    }
     setSessionUuid(newUuid);
     localStorage.setItem('session_uuid', newUuid);
-  }, []);
+    console.log('Session ID->', localStorage.getItem('session_uuid'));
+
+    // Load session details after setting the UUID
+    loadSessionDetails(newUuid);
+  }, [sessionId]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -238,6 +279,7 @@ export default function App() {
       <ChatSection
         messages={messages}
         isLoading={isLoading}
+        isLoadingSession={isLoadingSession}
         input={input}
         setInput={setInput}
         sendMessage={sendMessage}

@@ -1,7 +1,25 @@
 import React from 'react';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
-export default function ChatMessages({ messages, isLoading, darkMode }) {
+export default function ChatMessages({ messages, isLoading, isLoadingSession, darkMode }) {
+  if (isLoadingSession) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center">
+        <div className="mb-8">
+          <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg border border-white/20">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+          </div>
+          <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            Loading Session...
+          </h2>
+          <p className={`text-base ${darkMode ? 'text-gray-300' : 'text-slate-600'}`}>
+            Please wait while we load your conversation history.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   if (messages.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center h-full text-center">
@@ -25,28 +43,22 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
   return (
     <div className="max-w-full space-y-6">
       {messages.map((msg, idx) => (
-        <div key={idx} className="flex gap-4 items-start">
-          {/* Avatar */}
-          <div className="flex-shrink-0 mt-1">
-            {msg.sender === "user" ? (
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md border border-blue-200">
-                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                </svg>
-              </div>
-            ) : (
+        <div key={idx} className={`flex gap-4 items-start ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+          {/* Assistant Avatar - Left side */}
+          {msg.sender === "assistant" && (
+            <div className="flex-shrink-0 mt-1">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-md border border-purple-200">
                 <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
                 </svg>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Message Content */}
-          <div className="flex-1 min-w-0">
+          <div className={`flex-1 min-w-0 ${msg.sender === 'user' ? 'max-w-[85%]' : 'max-w-[85%]'}`}>
             {msg.sender === "user" ? (
-              <div className="max-w-[85%] ml-auto">
+              <div className="ml-auto">
                 <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 rounded-2xl rounded-tr-md shadow-md border border-blue-400/20">
                   <div className="prose prose-invert max-w-none text-white text-sm prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-li:my-1 prose-pre:my-2 prose-blockquote:my-2 prose-hr:my-4">
                     <MarkdownRenderer content={msg.text} darkMode={true} />
@@ -103,12 +115,23 @@ export default function ChatMessages({ messages, isLoading, darkMode }) {
               </div>
             )}
           </div>
+
+          {/* User Avatar - Right side */}
+          {msg.sender === "user" && (
+            <div className="flex-shrink-0 mt-1">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center shadow-md border border-blue-200">
+                <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                </svg>
+              </div>
+            </div>
+          )}
         </div>
       ))}
 
       {/* Loading indicator */}
       {isLoading && (
-        <div className="flex gap-4 items-start">
+        <div className="flex gap-4 items-start justify-start">
           <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-md border border-purple-200">
             <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>

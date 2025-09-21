@@ -7,6 +7,7 @@ import { useTheme } from '../common/ThemeProvider';
 export default function ChatSection({
   messages,
   isLoading,
+  isLoadingSession,
   input,
   setInput,
   sendMessage,
@@ -31,6 +32,7 @@ export default function ChatSection({
         <ChatMessages
           messages={messages}
           isLoading={isLoading}
+          isLoadingSession={isLoadingSession}
           darkMode={darkMode}
         />
         <div ref={chatEndRef} />
