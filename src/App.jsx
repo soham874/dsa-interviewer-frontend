@@ -1,8 +1,41 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import ChatSection from './components/Chat/ChatSection';
 import CodeEditor from './components/CodeEditor/CodeEditor';
 import { API_BASE_URL } from './config';
 import { useTheme } from './components/common/ThemeProvider';
+import { readEventStream } from './utils/eventStream';
+
+// Version 2 of the chat stream sends JSON events, including question cards
+const STREAM_PROTOCOL = 2;
+
+const newId = () => crypto.randomUUID();
+const now = () => new Date().toISOString();
+
+const REQUEST_ERRORS = {
+  401: "Your sign-in has expired. Please log in again.",
+  404: "This session could not be found for your account.",
+  409: "Sarthi is still replying to your previous message. Please wait a moment.",
+};
+
+// Converts a transcript message from the backend into the shape the chat renders
+const fromTranscript = (msg) => {
+  if (msg.role === 'user') {
+    return {
+      id: newId(),
+      sender: 'user',
+      text: msg.content,
+      hasAttachedCode: Boolean(msg.code),
+      attachedCode: msg.code || null,
+    };
+  }
+  return {
+    id: newId(),
+    sender: 'assistant',
+    kind: msg.question ? 'question_card' : 'text',
+    question: msg.question || null,
+    text: msg.content,
+  };
+};
 
 export default function App({ sessionId }) {
   const [sessionUuid, setSessionUuid] = useState(() => crypto.randomUUID());
@@ -10,12 +43,16 @@ export default function App({ sessionId }) {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingSession, setIsLoadingSession] = useState(false);
+  const [statusText, setStatusText] = useState("");
   const [noteText, setNoteText] = useState("");
   const [attachCode, setAttachCode] = useState(false);
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
   const codeEditorRef = useRef(null);
+  const noteTextRef = useRef(noteText);
   const { darkMode } = useTheme();
+
+  noteTextRef.current = noteText;
 
   const scrollToBottom = () => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -33,11 +70,25 @@ export default function App({ sessionId }) {
     }
   }, [input]);
 
+  // Stable, so memoised messages do not re-render when the editor changes
+  const handleUseStarterCode = useCallback((starterCode) => {
+    const current = noteTextRef.current.trim();
+    if (current && current !== starterCode.trim()
+      && !window.confirm("Replace the code in the editor with the starter code?")) {
+      return;
+    }
+    setNoteText(starterCode);
+  }, []);
+
+  const appendAssistantMessage = (text) => {
+    setMessages((prev) => [...prev, { id: newId(), sender: "assistant", text, timestamp: now() }]);
+  };
+
   // Load session details
   const loadSessionDetails = async (uuid) => {
     try {
       setIsLoadingSession(true);
-      const response = await fetch(`${API_BASE_URL}/load_session_details/${uuid}`, {
+      const response = await fetch(`${API_BASE_URL}/sessions/${uuid}/transcript`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -45,19 +96,12 @@ export default function App({ sessionId }) {
 
       if (response.ok) {
         const data = await response.json();
-        if (data.message_list && Array.isArray(data.message_list)) {
-          // Transform the messages from backend format to frontend format
-          const transformedMessages = data.message_list.map(msg => ({
-            sender: msg.role === 'user' ? 'user' : 'assistant',
-            text: msg.content,
-            timestamp: msg.timestamp || new Date().toISOString(),
-            hasAttachedCode: msg.hasAttachedCode || false,
-            attachedCode: msg.attachedCode || null
-          }));
-          setMessages(transformedMessages);
-        }
+        setMessages((data.messages || []).map(fromTranscript));
       } else {
         console.error('Failed to load session details:', response.status);
+        if (REQUEST_ERRORS[response.status]) {
+          setMessages([{ id: newId(), sender: "assistant", text: REQUEST_ERRORS[response.status] }]);
+        }
       }
     } catch (error) {
       console.error("Error loading session details:", error);
@@ -74,7 +118,6 @@ export default function App({ sessionId }) {
     }
     setSessionUuid(newUuid);
     localStorage.setItem('session_uuid', newUuid);
-    console.log('Session ID->', localStorage.getItem('session_uuid'));
 
     // Load session details after setting the UUID
     loadSessionDetails(newUuid);
@@ -84,170 +127,76 @@ export default function App({ sessionId }) {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
-    // Prepare the message content
-    let messageContent = input;
-    let hasAttachedCode = false;
+    const code = attachCode && noteText.trim() ? noteText : null;
 
-    if (attachCode && noteText.trim()) {
-      messageContent = `${input} - CODE - "${noteText}"`;
-      hasAttachedCode = true;
-    }
-
-    const userMessage = {
+    setMessages((prev) => [...prev, {
+      id: newId(),
       sender: "user",
       text: input,
-      hasAttachedCode: hasAttachedCode,
-      attachedCode: hasAttachedCode ? noteText : null,
-      timestamp: new Date().toISOString()
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
+      hasAttachedCode: Boolean(code),
+      attachedCode: code,
+      timestamp: now()
+    }]);
     setInput("");
     setIsLoading(true);
+    setStatusText("");
+
+    // The assistant message that streamed text is appended to; a question card starts a new one
+    let textMessageId = null;
+
+    const appendText = (text) => {
+      if (!textMessageId) {
+        const id = newId();
+        textMessageId = id;
+        setMessages((prev) => [...prev, { id, sender: "assistant", text, timestamp: now() }]);
+        return;
+      }
+      const id = textMessageId;
+      setMessages((prev) => prev.map((msg) => (msg.id === id ? { ...msg, text: msg.text + text } : msg)));
+    };
+
+    const handleEvent = (name, data) => {
+      if (name === "token") {
+        setStatusText("");
+        appendText(JSON.parse(data).text);
+      } else if (name === "question") {
+        textMessageId = null;
+        const question = JSON.parse(data);
+        setMessages((prev) => [...prev, {
+          id: newId(), sender: "assistant", kind: "question_card", question, text: "", timestamp: now()
+        }]);
+      } else if (name === "status") {
+        setStatusText(JSON.parse(data).text);
+      } else if (name === "error") {
+        textMessageId = null;
+        appendAssistantMessage(JSON.parse(data).message);
+      }
+    };
 
     try {
-
-      const session_uuid_val = localStorage.getItem('session_uuid');
-
       const response = await fetch(`${API_BASE_URL}/chat/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ session_uuid: session_uuid_val, message: messageContent, mode: "DSA" }),
+        body: JSON.stringify({
+          session_id: localStorage.getItem('session_uuid'),
+          message: input,
+          code,
+          protocol: STREAM_PROTOCOL,
+        }),
       });
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-
-      // Add a placeholder assistant message
-      let assistantMessage = { sender: "assistant", text: "" };
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      const updateAssistantMessage = (newText) => {
-        setMessages((prev) => {
-          const updated = [...prev];
-          updated[updated.length - 1] = {
-            ...updated[updated.length - 1],
-            text: newText,
-            timestamp: updated[updated.length - 1].timestamp,
-          };
-          return updated;
-        });
-      };
-
-      let buffer = "";
-      let fullResponse = "";
-
-      while (true) {
-        const { value, done } = await reader.read();
-        if (done) {
-          // Add timestamp when streaming is complete
-          setMessages((prev) => {
-            const updated = [...prev];
-            updated[updated.length - 1] = {
-              ...updated[updated.length - 1],
-              text: fullResponse,
-              timestamp: new Date().toISOString()
-            };
-            return updated;
-          });
-          break;
-        }
-
-        // Decode the chunk and add to buffer
-        buffer += decoder.decode(value, { stream: true });
-
-        // Process complete SSE messages (separated by \n\n)
-        let parts = buffer.split('\n\n');
-
-        // Keep the last part in buffer (might be incomplete)
-        buffer = parts.pop() || "";
-
-        // Process complete SSE messages
-        for (const part of parts) {
-          if (part.trim() === '') continue;
-
-          const lines = part.split('\n');
-          let eventType = null;
-          let dataLines = [];
-
-          for (const line of lines) {
-            if (line.startsWith('event: ')) {
-              eventType = line.slice(7).trim();
-            } else if (line.startsWith('data: ')) {
-              dataLines.push(line.slice(6));
-            }
-          }
-
-          // Handle the data
-          if (dataLines.length > 0) {
-            // Join all data lines for this SSE message
-            const data = dataLines.join('\n');
-
-            if (eventType === 'end' || data.trim() === 'end') {
-              // Stream ended, add timestamp
-              setMessages((prev) => {
-                const updated = [...prev];
-                updated[updated.length - 1] = {
-                  ...updated[updated.length - 1],
-                  text: fullResponse,
-                  timestamp: new Date().toISOString()
-                };
-                return updated;
-              });
-              break;
-            } else {
-              // Regular data chunk - handle escaped newlines
-              let chunk = data;
-              if (data.includes('\\n')) {
-                chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-              }
-              fullResponse += chunk;
-              // Update without timestamp during streaming
-              updateAssistantMessage(fullResponse);
-            }
-          }
-        }
+      if (!response.ok) {
+        appendAssistantMessage(REQUEST_ERRORS[response.status] || "Sorry, I encountered an error. Please try again.");
+        return;
       }
 
-      // Process any remaining data in buffer
-      if (buffer.trim()) {
-        const lines = buffer.split('\n');
-        let dataLines = [];
-
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            dataLines.push(line.slice(6));
-          }
-        }
-
-        if (dataLines.length > 0) {
-          const data = dataLines.join('\n');
-          let chunk = data;
-          if (data.includes('\\n')) {
-            chunk = data.replace(/\\n/g, '\n').replace(/\\r/g, '\r');
-          }
-          fullResponse += chunk;
-          // Final update with timestamp
-          setMessages((prev) => {
-            const updated = [...prev];
-            updated[updated.length - 1] = {
-              ...updated[updated.length - 1],
-              text: fullResponse,
-              timestamp: new Date().toISOString()
-            };
-            return updated;
-          });
-        }
-      }
+      await readEventStream(response, handleEvent);
     } catch (error) {
       console.error("Error:", error);
-      setMessages((prev) => [...prev, {
-        sender: "assistant",
-        text: "Sorry, I encountered an error. Please try again.",
-        timestamp: new Date().toISOString()
-      }]);
+      appendAssistantMessage("Sorry, I encountered an error. Please try again.");
     } finally {
+      setStatusText("");
       setIsLoading(false);
     }
   };
@@ -280,6 +229,8 @@ export default function App({ sessionId }) {
         messages={messages}
         isLoading={isLoading}
         isLoadingSession={isLoadingSession}
+        statusText={statusText}
+        onUseStarterCode={handleUseStarterCode}
         input={input}
         setInput={setInput}
         sendMessage={sendMessage}
