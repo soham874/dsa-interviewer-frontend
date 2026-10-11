@@ -8,6 +8,8 @@ export default function ChatSection({
   messages,
   isLoading,
   isLoadingSession,
+  statusText,
+  onUseStarterCode,
   input,
   setInput,
   sendMessage,
@@ -33,7 +35,9 @@ export default function ChatSection({
           messages={messages}
           isLoading={isLoading}
           isLoadingSession={isLoadingSession}
+          statusText={statusText}
           darkMode={darkMode}
+          onUseStarterCode={onUseStarterCode}
         />
         <div ref={chatEndRef} />
       </div>

@@ -47,7 +47,7 @@ export default function UserHomepage() {
         });
 
         if (!response.ok) {
-          if (response.status === 400) {
+          if (response.status === 400 || response.status === 401) {
             throw new Error('User not logged in');
           }
           throw new Error(`HTTP error! status: ${response.status}`);
