@@ -14,7 +14,7 @@ export default function ChatHeader() {
             </svg>
           </div>
           <div>
-            <h1 className="text-xl font-bold">Sarthi - Your DSA Coach</h1>
+            <h1 className="text-xl font-bold">Sarthi</h1>
           </div>
         </div>
         <ThemeToggle darkMode={darkMode} onToggle={() => setDarkMode(!darkMode)} />

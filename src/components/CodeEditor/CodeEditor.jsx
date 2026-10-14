@@ -3,6 +3,7 @@ import CodeEditorHeader from './CodeEditorHeader';
 import { useTheme } from '../common/ThemeProvider';
 
 export default function CodeEditor({
+  width,
   noteText,
   setNoteText,
   attachCode,
@@ -12,7 +13,7 @@ export default function CodeEditor({
   const codeEditorRef = useRef(null);
 
   return (
-    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${
+    <div style={{ width: `${width}%` }} className={`flex flex-col flex-shrink-0 min-w-0 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${
       darkMode
         ? 'bg-slate-800/50 border border-slate-700/50'
         : 'bg-white/80 border border-white/40'
@@ -38,6 +39,8 @@ export default function CodeEditor({
             value={noteText}
             onChange={(e) => setNoteText(e.target.value)}
             onKeyDown={handleCodeEditorKeyDown}
+            wrap="off"
+            spellCheck={false}
             placeholder="// Start coding here...
 class Solution(){
     public static void main(String[] args){
@@ -45,7 +48,7 @@ class Solution(){
     }
 }
 "
-            className={`w-full h-full resize-none rounded-2xl p-6 outline-none transition-all duration-200 shadow-sm font-mono text-sm leading-relaxed border-2 ${
+            className={`w-full h-full resize-none whitespace-pre overflow-auto rounded-2xl p-6 outline-none transition-all duration-200 shadow-sm font-mono text-sm leading-relaxed border-2 ${
               darkMode
                 ? attachCode && noteText.trim()
                   ? 'border-emerald-500/30 focus:border-emerald-400 focus:ring-2 focus:ring-emerald-900 bg-gray-900 text-gray-100 placeholder-gray-500'

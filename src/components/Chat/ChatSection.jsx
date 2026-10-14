@@ -22,7 +22,7 @@ export default function ChatSection({
 }) {
   const { darkMode, toggleDarkMode } = useTheme();
   return (
-    <div className={`flex flex-col w-1/2 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${darkMode
+    <div className={`flex flex-col flex-1 min-w-0 shadow-xl rounded-2xl overflow-hidden backdrop-blur-lg ${darkMode
       ? 'bg-slate-800/50 border border-slate-700/50'
       : 'bg-white/80 border border-white/40'}`}>
       <ChatHeader />

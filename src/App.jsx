@@ -8,6 +8,10 @@ import { readEventStream } from './utils/eventStream';
 // Version 2 of the chat stream sends JSON events, including question cards
 const STREAM_PROTOCOL = 2;
 
+// Bounds for the code editor pane, as a percent of the chat + editor row
+const MIN_EDITOR_WIDTH = 30;
+const MAX_EDITOR_WIDTH = 70;
+
 const newId = () => crypto.randomUUID();
 const now = () => new Date().toISOString();
 
@@ -50,6 +54,8 @@ export default function App({ sessionId }) {
   const textareaRef = useRef(null);
   const codeEditorRef = useRef(null);
   const noteTextRef = useRef(noteText);
+  const panesRef = useRef(null);
+  const [editorWidth, setEditorWidth] = useState(50); // percent of the panes row
   const { darkMode } = useTheme();
 
   noteTextRef.current = noteText;
@@ -221,10 +227,44 @@ export default function App({ sessionId }) {
     }
   };
 
+  const clampEditorWidth = (pct) => Math.min(MAX_EDITOR_WIDTH, Math.max(MIN_EDITOR_WIDTH, pct));
+
+  // Drag the divider to resize the editor; the chat pane takes the remaining width
+  const startResize = (e) => {
+    e.preventDefault();
+    const rowWidth = panesRef.current.getBoundingClientRect().width;
+    const startX = e.clientX;
+    const startWidth = editorWidth;
+    const onMove = (ev) => {
+      setEditorWidth(clampEditorWidth(startWidth + ((startX - ev.clientX) / rowWidth) * 100));
+    };
+    const onUp = () => {
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
+  const handleResizeKeyDown = (e) => {
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      setEditorWidth((w) => clampEditorWidth(w + 2));
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      setEditorWidth((w) => clampEditorWidth(w - 2));
+    }
+  };
+
   return (
-        <div className={`flex h-screen p-4 gap-4 ${darkMode
+        <div className={`h-screen p-4 ${darkMode
       ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900'
       : 'bg-gradient-to-br from-slate-50 via-purple-50 to-blue-50'}`}>
+      <div ref={panesRef} className="flex h-full">
       <ChatSection
         messages={messages}
         isLoading={isLoading}
@@ -241,12 +281,32 @@ export default function App({ sessionId }) {
         textareaRef={textareaRef}
         chatEndRef={chatEndRef}
       />
+      <div
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize code editor"
+        aria-valuenow={Math.round(editorWidth)}
+        aria-valuemin={MIN_EDITOR_WIDTH}
+        aria-valuemax={MAX_EDITOR_WIDTH}
+        tabIndex={0}
+        onPointerDown={startResize}
+        onKeyDown={handleResizeKeyDown}
+        onDoubleClick={() => setEditorWidth(50)}
+        title="Drag to resize, double-click to reset"
+        className="group flex-shrink-0 w-4 flex items-center justify-center cursor-col-resize outline-none"
+      >
+        <div className={`w-1 h-16 rounded-full transition-colors group-hover:bg-blue-500 group-focus-visible:bg-blue-500 ${
+          darkMode ? 'bg-slate-600' : 'bg-slate-300'
+        }`} />
+      </div>
       <CodeEditor
+        width={editorWidth}
         noteText={noteText}
         setNoteText={setNoteText}
         attachCode={attachCode}
         handleCodeEditorKeyDown={handleCodeEditorKeyDown}
       />
+      </div>
     </div>
   );
 }

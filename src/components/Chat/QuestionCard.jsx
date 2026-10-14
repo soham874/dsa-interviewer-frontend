@@ -2,47 +2,20 @@ import React from 'react';
 import { ClipboardCopy } from 'lucide-react';
 import MarkdownRenderer from '../common/MarkdownRenderer';
 
-const DIFFICULTY_STYLES = {
-  Easy: 'bg-emerald-500/20 text-emerald-100 border-emerald-300/40',
-  Medium: 'bg-amber-500/20 text-amber-100 border-amber-300/40',
-  Hard: 'bg-red-500/20 text-red-100 border-red-300/40',
-};
-
 export default function QuestionCard({ question, darkMode, onUseStarterCode }) {
   return (
     <div className={`rounded-2xl overflow-hidden shadow-md border ${
       darkMode ? 'bg-gray-900/60 border-gray-700' : 'bg-white border-slate-200'
     }`}>
       {/* Header */}
-      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-4 flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="text-xs font-semibold uppercase tracking-wide text-white/80">
-            Question {question.number} of {question.total}
-          </div>
-          <h3 className="text-lg font-bold leading-snug">{question.title}</h3>
+      <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-5 py-4">
+        <div className="text-xs font-semibold uppercase tracking-wide text-white/80">
+          Question {question.number} of {question.total}
         </div>
-        <span className={`flex-shrink-0 text-xs font-semibold px-3 py-1 rounded-full border ${
-          DIFFICULTY_STYLES[question.difficulty] || DIFFICULTY_STYLES.Medium
-        }`}>
-          {question.difficulty}
-        </span>
+        <h3 className="text-lg font-bold leading-snug">{question.title}</h3>
       </div>
 
       <div className="p-5">
-        {question.topics?.length > 0 && (
-          <div className="flex flex-wrap gap-2 mb-4">
-            {question.topics.map((topic) => (
-              <span key={topic} className={`text-xs px-2 py-1 rounded-lg border ${
-                darkMode
-                  ? 'bg-slate-800 text-slate-300 border-slate-700'
-                  : 'bg-slate-100 text-slate-600 border-slate-200'
-              }`}>
-                {topic}
-              </span>
-            ))}
-          </div>
-        )}
-
         {/* Problem statement */}
         <div className={`prose max-w-none text-sm ${
           darkMode

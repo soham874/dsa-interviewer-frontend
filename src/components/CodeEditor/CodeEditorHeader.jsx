@@ -53,7 +53,7 @@ export default function CodeEditorHeader({ noteText, attachCode, onBackToHome })
   };
 
   return (
-    <div className="flex items-center justify-between px-4 py-3">
+    <div className="flex flex-wrap items-center justify-between gap-y-3 px-4 py-3">
       {/* Left - Logo & Title */}
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm border border-white/10">
